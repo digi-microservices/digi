@@ -1,0 +1,20 @@
+{
+  "name": "@digi/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "digi": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "bun build --compile src/index.ts --outfile dist/digi",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@digi/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@digi/typescript-config": "workspace:*",
+    "@types/bun": "latest",
+    "typescript": "^5.8.2"
+  }
+}

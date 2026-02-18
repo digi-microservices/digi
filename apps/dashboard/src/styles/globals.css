@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-digi-blue: #3A7DFF;
+  --color-digi-blue-hover: #2E6BE6;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-neutral-950 text-white;
+  overflow-x: hidden;
+}

@@ -1,0 +1,36 @@
+# Digi local development Caddyfile
+# Reverse proxies all apps behind localhost:80
+# Access: http://localhost, http://app.localhost, http://admin.localhost, http://api.localhost
+
+{
+	# Admin API for dynamic route management
+	admin :2019
+
+	# Disable HTTPS for local dev
+	auto_https off
+}
+
+# Landing page — http://localhost
+http://localhost {
+	reverse_proxy host.docker.internal:3000
+}
+
+# API — http://api.localhost
+http://api.localhost {
+	reverse_proxy host.docker.internal:4000
+}
+
+# Dashboard — http://app.localhost
+http://app.localhost {
+	reverse_proxy host.docker.internal:3001
+}
+
+# Admin — http://admin.localhost
+http://admin.localhost {
+	reverse_proxy host.docker.internal:3002
+}
+
+# Mailpit UI — http://mail.localhost
+http://mail.localhost {
+	reverse_proxy mailpit:8025
+}

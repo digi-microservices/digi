@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": ["**/.env.*local", "**/.env"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -22,9 +22,19 @@
     "db:push": {
       "cache": false
     },
+    "db:migrate": {
+      "cache": false
+    },
     "db:studio": {
       "cache": false,
       "persistent": true
+    },
+    "seed:admin": {
+      "cache": false
+    },
+    "cli:build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
     }
   }
 }

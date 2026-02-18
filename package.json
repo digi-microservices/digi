@@ -8,6 +8,13 @@
   ],
   "scripts": {
     "dev": "turbo dev",
+    "dev:setup": "./scripts/dev-setup.sh",
+    "dev:infra": "docker compose up -d",
+    "dev:infra:stop": "docker compose down",
+    "dev:infra:reset": "docker compose down -v && docker compose up -d",
+    "db:push": "bun run --filter @digi/db db:push",
+    "db:studio": "bun run --filter @digi/db db:studio",
+    "seed:admin": "bun run --filter @digi/api seed:admin",
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
