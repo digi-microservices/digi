@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { coupons, auditLogs } from "@digi/db/schema";
 import { generateId } from "@digi/shared/utils";
-import { type Context } from "../../context.js";
+import { type Context } from "../../context";
 
 function requireAdmin(ctx: Context) {
   if (!ctx.user) throw new Error("Unauthorized");
@@ -29,7 +29,7 @@ export const couponResolvers = {
     createCoupon: async (
       _: unknown,
       args: { input: CreateCouponInput },
-      ctx: Context
+      ctx: Context,
     ) => {
       requireAdmin(ctx);
 
@@ -67,7 +67,7 @@ export const couponResolvers = {
     deactivateCoupon: async (
       _: unknown,
       args: { id: string },
-      ctx: Context
+      ctx: Context,
     ) => {
       requireAdmin(ctx);
 
@@ -90,11 +90,7 @@ export const couponResolvers = {
       });
     },
 
-    deleteCoupon: async (
-      _: unknown,
-      args: { id: string },
-      ctx: Context
-    ) => {
+    deleteCoupon: async (_: unknown, args: { id: string }, ctx: Context) => {
       requireAdmin(ctx);
 
       await ctx.db.delete(coupons).where(eq(coupons.id, args.id));

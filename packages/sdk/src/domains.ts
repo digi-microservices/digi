@@ -1,5 +1,5 @@
-import { type DigiClient } from "./client.js";
-import { type Domain } from "./types.js";
+import { type DigiClient } from "./client";
+import { type Domain } from "./types";
 
 export class DomainsAPI {
   constructor(private readonly client: DigiClient) {}

@@ -22,7 +22,7 @@ export function StatCard({
   };
 
   return (
-    <div className="rounded-xl border border-white/5 bg-neutral-900 p-5">
+    <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-neutral-400">{label}</p>

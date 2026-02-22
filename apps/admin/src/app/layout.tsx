@@ -27,7 +27,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={calSans.variable}>
-      <body className="bg-neutral-950 text-white antialiased">
+      <body className="bg-charcoal text-white antialiased">
         {children}
         <Toaster theme="dark" richColors position="bottom-right" />
       </body>

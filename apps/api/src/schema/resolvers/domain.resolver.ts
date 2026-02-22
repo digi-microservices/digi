@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { platformDomains, auditLogs } from "@digi/db/schema";
 import { generateId } from "@digi/shared/utils";
 import { CacheKeys, CacheTTL } from "@digi/redis/cache";
-import { type Context } from "../../context.js";
+import { type Context } from "../../context";
 
 function requireAdmin(ctx: Context) {
   if (!ctx.user) throw new Error("Unauthorized");
@@ -34,7 +34,7 @@ export const domainResolvers = {
     addDomain: async (
       _: unknown,
       args: { input: AddDomainInput },
-      ctx: Context
+      ctx: Context,
     ) => {
       requireAdmin(ctx);
 
@@ -77,11 +77,7 @@ export const domainResolvers = {
       });
     },
 
-    removeDomain: async (
-      _: unknown,
-      args: { id: string },
-      ctx: Context
-    ) => {
+    removeDomain: async (_: unknown, args: { id: string }, ctx: Context) => {
       requireAdmin(ctx);
 
       await ctx.db
@@ -104,14 +100,12 @@ export const domainResolvers = {
     setDomainDefault: async (
       _: unknown,
       args: { id: string },
-      ctx: Context
+      ctx: Context,
     ) => {
       requireAdmin(ctx);
 
       // Unset all defaults
-      await ctx.db
-        .update(platformDomains)
-        .set({ isDefault: false });
+      await ctx.db.update(platformDomains).set({ isDefault: false });
 
       // Set new default
       await ctx.db

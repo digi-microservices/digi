@@ -1,4 +1,4 @@
-import { query, mutate } from "../lib/api.js";
+import { query, mutate } from "../lib/api";
 import {
   colors,
   success,
@@ -8,8 +8,8 @@ import {
   newline,
   table,
   spinner,
-} from "../lib/output.js";
-import { prompt, confirm, select } from "../lib/prompt.js";
+} from "../lib/output";
+import { prompt, confirm, select } from "../lib/prompt";
 
 // --- GraphQL response types ---
 
@@ -72,7 +72,10 @@ async function listServices(): Promise<void> {
     spin.stop();
 
     if (data.services.length === 0) {
-      info("No services found. Create one with " + colors.bold("digi services create"));
+      info(
+        "No services found. Create one with " +
+          colors.bold("digi services create"),
+      );
       return;
     }
 
@@ -89,7 +92,9 @@ async function listServices(): Promise<void> {
     newline();
   } catch (err) {
     spin.stop();
-    error(`Failed to list services: ${err instanceof Error ? err.message : String(err)}`);
+    error(
+      `Failed to list services: ${err instanceof Error ? err.message : String(err)}`,
+    );
     process.exit(1);
   }
 }
@@ -165,7 +170,9 @@ async function createService(): Promise<void> {
     newline();
   } catch (err) {
     spin.stop();
-    error(`Failed to create service: ${err instanceof Error ? err.message : String(err)}`);
+    error(
+      `Failed to create service: ${err instanceof Error ? err.message : String(err)}`,
+    );
     process.exit(1);
   }
 }
@@ -200,7 +207,9 @@ async function deleteService(id: string): Promise<void> {
     success(`Service ${colors.bold(id)} deleted.`);
   } catch (err) {
     spin.stop();
-    error(`Failed to delete service: ${err instanceof Error ? err.message : String(err)}`);
+    error(
+      `Failed to delete service: ${err instanceof Error ? err.message : String(err)}`,
+    );
     process.exit(1);
   }
 }
@@ -233,7 +242,9 @@ async function serviceInfo(id: string): Promise<void> {
     log(`  ${colors.bold("ID:")}          ${colors.dim(s.id)}`);
     log(`  ${colors.bold("Status:")}      ${formatStatus(s.status)}`);
     log(`  ${colors.bold("Subdomain:")}   ${s.subdomain}`);
-    log(`  ${colors.bold("Source:")}      ${s.sourceType}${s.repoUrl ? ` (${s.repoUrl})` : ""}${s.dockerImage ? ` (${s.dockerImage})` : ""}`);
+    log(
+      `  ${colors.bold("Source:")}      ${s.sourceType}${s.repoUrl ? ` (${s.repoUrl})` : ""}${s.dockerImage ? ` (${s.dockerImage})` : ""}`,
+    );
     log(`  ${colors.bold("Created:")}     ${formatDate(s.createdAt)}`);
 
     if (s.containers.length > 0) {
@@ -250,18 +261,22 @@ async function serviceInfo(id: string): Promise<void> {
       log(`  ${colors.bold("Recent Deployments:")}`);
       table(
         ["ID", "STATUS", "CREATED"],
-        s.deployments.slice(0, 5).map((d) => [
-          d.id.slice(0, 8),
-          formatStatus(d.status),
-          formatDate(d.createdAt),
-        ]),
+        s.deployments
+          .slice(0, 5)
+          .map((d) => [
+            d.id.slice(0, 8),
+            formatStatus(d.status),
+            formatDate(d.createdAt),
+          ]),
       );
     }
 
     newline();
   } catch (err) {
     spin.stop();
-    error(`Failed to fetch service info: ${err instanceof Error ? err.message : String(err)}`);
+    error(
+      `Failed to fetch service info: ${err instanceof Error ? err.message : String(err)}`,
+    );
     process.exit(1);
   }
 }

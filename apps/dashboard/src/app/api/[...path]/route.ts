@@ -10,19 +10,20 @@ async function handler(
   const { path } = await params;
   const pathStr = path.join("/");
 
+  console.log(path, req.url);
+
   const upstream =
     pathStr === "graphql"
       ? `${API_URL}/graphql`
       : `${API_URL}/api/auth/${pathStr}`;
 
-  console.log("[proxy]", req.method, `/${pathStr}`, "->", upstream);
-
   const headers = new Headers(req.headers);
   headers.delete("host");
 
-  const sessionCookie = req.cookies.get("better-auth.session_token");
-  if (sessionCookie) {
-    headers.set("cookie", `better-auth.session_token=${sessionCookie.value}`);
+  // Forward all cookies from the browser
+  const cookieHeader = req.cookies.toString();
+  if (cookieHeader) {
+    headers.set("cookie", cookieHeader);
   }
 
   try {
@@ -35,14 +36,27 @@ async function handler(
       duplex: "half",
     });
 
-    const resHeaders = new Headers(response.headers);
-    resHeaders.delete("content-encoding");
-    resHeaders.delete("transfer-encoding");
+    // Build response headers WITHOUT Set-Cookie (we handle those separately)
+    const resHeaders = new Headers();
+    for (const [key, value] of response.headers.entries()) {
+      if (key.toLowerCase() === "set-cookie") continue;
+      if (key.toLowerCase() === "content-encoding") continue;
+      if (key.toLowerCase() === "transfer-encoding") continue;
+      resHeaders.set(key, value);
+    }
 
-    return new NextResponse(response.body, {
+    const res = new NextResponse(response.body, {
       status: response.status,
       headers: resHeaders,
     });
+
+    // Properly forward Set-Cookie headers one-by-one
+    const setCookies = response.headers.getSetCookie();
+    for (const cookie of setCookies) {
+      res.headers.append("set-cookie", cookie);
+    }
+
+    return res;
   } catch (err) {
     console.error("[proxy] error:", err);
     return NextResponse.json({ error: "Proxy error" }, { status: 502 });

@@ -1,5 +1,5 @@
-import { type Context } from "../context.js";
-import { AuthenticationError } from "../errors.js";
+import { type Context } from "../context";
+import { AuthenticationError } from "../errors";
 
 export function requireAuth(ctx: Context): asserts ctx is Context & {
   user: NonNullable<Context["user"]>;

@@ -1,5 +1,9 @@
-import { type DigiClient } from "./client.js";
-import { type Service, type Deployment, type CreateServiceInput } from "./types.js";
+import { type DigiClient } from "./client";
+import {
+  type Service,
+  type Deployment,
+  type CreateServiceInput,
+} from "./types";
 
 export class ServicesAPI {
   constructor(private readonly client: DigiClient) {}

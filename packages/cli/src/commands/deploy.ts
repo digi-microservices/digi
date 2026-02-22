@@ -1,7 +1,16 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { mutate } from "../lib/api.js";
-import { colors, success, error, info, warning, log, newline, spinner } from "../lib/output.js";
+import { mutate } from "../lib/api";
+import {
+  colors,
+  success,
+  error,
+  info,
+  warning,
+  log,
+  newline,
+  spinner,
+} from "../lib/output";
 
 interface DeployServiceResponse {
   deployService: {
@@ -77,7 +86,10 @@ export async function deployCommand(args: string[]): Promise<void> {
       error("--only flag requires a comma-separated list of components.");
       process.exit(1);
     }
-    onlyComponents = onlyValue.split(",").map((c) => c.trim()).filter(Boolean);
+    onlyComponents = onlyValue
+      .split(",")
+      .map((c) => c.trim())
+      .filter(Boolean);
   }
 
   const raw = readFileSync(tomlPath, "utf-8");
@@ -103,7 +115,12 @@ export async function deployCommand(args: string[]): Promise<void> {
   log(`  ${colors.bold("Deploying from digi.toml...")}`);
   newline();
 
-  const results: Array<{ name: string; ok: boolean; url?: string; time: number }> = [];
+  const results: Array<{
+    name: string;
+    ok: boolean;
+    url?: string;
+    time: number;
+  }> = [];
 
   for (const name of toDeploy) {
     const service = services[name];
@@ -130,9 +147,17 @@ export async function deployCommand(args: string[]): Promise<void> {
       const elapsed = ((performance.now() - start) / 1000).toFixed(1);
       spin.stop(undefined);
 
-      const statusLabel = data.deployService.status === "queued" ? "deployed" : data.deployService.status;
+      const statusLabel =
+        data.deployService.status === "queued"
+          ? "deployed"
+          : data.deployService.status;
       success(`${colors.bold(name).padEnd(20)} — ${statusLabel} (${elapsed}s)`);
-      results.push({ name, ok: true, url: data.deployService.url, time: Number(elapsed) });
+      results.push({
+        name,
+        ok: true,
+        url: data.deployService.url,
+        time: Number(elapsed),
+      });
     } catch (err) {
       const elapsed = ((performance.now() - start) / 1000).toFixed(1);
       spin.stop(undefined);

@@ -1,8 +1,8 @@
-export { DigiClient, DigiSDKError } from "./client.js";
-export { ServicesAPI } from "./services.js";
-export { DeploymentsAPI } from "./deployments.js";
-export { DomainsAPI } from "./domains.js";
-export { EnvAPI } from "./env.js";
+export { DigiClient, DigiSDKError } from "./client";
+export { ServicesAPI } from "./services";
+export { DeploymentsAPI } from "./deployments";
+export { DomainsAPI } from "./domains";
+export { EnvAPI } from "./env";
 export type {
   Service,
   Deployment,
@@ -10,4 +10,4 @@ export type {
   EnvVar,
   CreateServiceInput,
   DigiClientConfig,
-} from "./types.js";
+} from "./types";

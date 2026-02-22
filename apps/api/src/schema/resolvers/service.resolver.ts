@@ -10,7 +10,7 @@ import {
 import { generateId, generateSubdomain } from "@digi/shared/utils";
 import { CacheKeys, CacheTTL } from "@digi/redis/cache";
 import { Channels } from "@digi/redis/pubsub";
-import { type Context } from "../../context.js";
+import { type Context } from "../../context";
 import { generateContainerSubdomain } from "@digi/shared/utils";
 
 interface CreateServiceInput {
@@ -19,6 +19,8 @@ interface CreateServiceInput {
   gitUrl?: string;
   branch?: string;
   dockerImage?: string;
+  dockerPort?: number;
+  internalPort?: number;
   platformDomainId?: string;
   customDomain?: string;
   containers: Array<{
@@ -27,6 +29,7 @@ interface CreateServiceInput {
     dockerImage?: string;
     envVars?: Record<string, string>;
     resourceLimits?: Record<string, string>;
+    internalPort?: number;
   }>;
   envVars?: Record<string, string>;
 }
@@ -39,18 +42,12 @@ interface UpdateServiceInput {
 
 export const serviceResolvers = {
   Query: {
-    services: async (
-      _: unknown,
-      args: { userId?: string },
-      ctx: Context
-    ) => {
+    services: async (_: unknown, args: { userId?: string }, ctx: Context) => {
       // console.log(ctx)
       if (!ctx.user) throw new Error("Unauthorized");
 
       const userId =
-        ctx.user.role === "admin" && args.userId
-          ? args.userId
-          : ctx.user.id;
+        ctx.user.role === "admin" && args.userId ? args.userId : ctx.user.id;
 
       // Check cache
       const cached = await ctx.cache.get(CacheKeys.userServices(userId));
@@ -64,7 +61,7 @@ export const serviceResolvers = {
       await ctx.cache.set(
         CacheKeys.userServices(userId),
         result,
-        CacheTTL.USER_SERVICES
+        CacheTTL.USER_SERVICES,
       );
 
       return result;
@@ -95,7 +92,7 @@ export const serviceResolvers = {
     createService: async (
       _: unknown,
       args: { input: CreateServiceInput },
-      ctx: Context
+      ctx: Context,
     ) => {
       if (!ctx.user) throw new Error("Unauthorized");
       const { input } = args;
@@ -123,7 +120,7 @@ export const serviceResolvers = {
         : `https://${subdomain}.localhost`;
 
       const dashboardUrl = `http://localhost:3001/services/${serviceId}`;
-
+      console.log(input);
       // Create service
       await ctx.db.insert(services).values({
         id: serviceId,
@@ -154,6 +151,7 @@ export const serviceResolvers = {
           name: c.name,
           subdomain: containerSubdomain,
           dockerImage: c.dockerImage,
+          internalPort: c.internalPort,
           envVars: c.envVars ?? {},
           resourceLimits: c.resourceLimits ?? {},
         });
@@ -184,11 +182,7 @@ export const serviceResolvers = {
       return result;
     },
 
-    deleteService: async (
-      _: unknown,
-      args: { id: string },
-      ctx: Context
-    ) => {
+    deleteService: async (_: unknown, args: { id: string }, ctx: Context) => {
       if (!ctx.user) throw new Error("Unauthorized");
 
       const service = await ctx.db.query.services.findFirst({
@@ -207,7 +201,10 @@ export const serviceResolvers = {
         type: "destroy",
         payload: { serviceId: args.id },
       });
-      await ctx.pubsub.publish(Channels.jobNew(), { id: jobId, type: "destroy" });
+      await ctx.pubsub.publish(Channels.jobNew(), {
+        id: jobId,
+        type: "destroy",
+      });
 
       // Update status
       await ctx.db
@@ -225,7 +222,7 @@ export const serviceResolvers = {
     updateService: async (
       _: unknown,
       args: { id: string; input: UpdateServiceInput },
-      ctx: Context
+      ctx: Context,
     ) => {
       if (!ctx.user) throw new Error("Unauthorized");
 
@@ -260,7 +257,7 @@ export const serviceResolvers = {
     deployService: async (
       _: unknown,
       args: { serviceId: string },
-      ctx: Context
+      ctx: Context,
     ) => {
       if (!ctx.user) throw new Error("Unauthorized");
 
@@ -290,7 +287,10 @@ export const serviceResolvers = {
         type: "deploy",
         payload: { serviceId: args.serviceId, deploymentId },
       });
-      await ctx.pubsub.publish(Channels.jobNew(), { id: jobId, type: "deploy" });
+      await ctx.pubsub.publish(Channels.jobNew(), {
+        id: jobId,
+        type: "deploy",
+      });
 
       // Update service status
       await ctx.db
@@ -305,8 +305,12 @@ export const serviceResolvers = {
 
     setEnvVars: async (
       _: unknown,
-      args: { serviceId: string; containerId?: string; vars: Record<string, string> },
-      ctx: Context
+      args: {
+        serviceId: string;
+        containerId?: string;
+        vars: Record<string, string>;
+      },
+      ctx: Context,
     ) => {
       if (!ctx.user) throw new Error("Unauthorized");
 
@@ -317,8 +321,8 @@ export const serviceResolvers = {
           .where(
             and(
               eq(containers.id, args.containerId),
-              eq(containers.serviceId, args.serviceId)
-            )
+              eq(containers.serviceId, args.serviceId),
+            ),
           );
       } else {
         await ctx.db
@@ -336,11 +340,11 @@ export const serviceResolvers = {
       subscribe: async function* (
         _: unknown,
         args: { serviceId: string; containerId: string },
-        ctx: Context
+        ctx: Context,
       ) {
         const channel = Channels.containerLogs(
           args.serviceId,
-          args.containerId
+          args.containerId,
         );
         const messages: unknown[] = [];
         let resolve: (() => void) | null = null;
@@ -373,7 +377,7 @@ export const serviceResolvers = {
       subscribe: async function* (
         _: unknown,
         args: { jobId: string },
-        ctx: Context
+        ctx: Context,
       ) {
         const channel = Channels.deploymentStatus(args.jobId);
         const messages: unknown[] = [];

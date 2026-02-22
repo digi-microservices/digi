@@ -1,7 +1,7 @@
 import { type Client } from "discord.js";
 import { and, eq, lt, sql } from "drizzle-orm";
 import { type Database, tickets } from "@digi/db";
-import { sendInactivityWarning } from "../handlers/inactivity.js";
+import { sendInactivityWarning } from "../handlers/inactivity";
 
 const INACTIVITY_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24 hours
 const CHECK_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
@@ -9,7 +9,7 @@ const CHECK_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 export function startInactivityCheck(
   db: Database,
   client: Client,
-  dashboardUrl: string
+  dashboardUrl: string,
 ) {
   const run = async () => {
     try {
@@ -18,7 +18,7 @@ export function startInactivityCheck(
       const inactiveTickets = await db.query.tickets.findMany({
         where: and(
           eq(tickets.status, "open"),
-          lt(tickets.lastMessageAt, threshold)
+          lt(tickets.lastMessageAt, threshold),
         ),
       });
 

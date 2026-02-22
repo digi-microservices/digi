@@ -19,7 +19,7 @@ export default function ServiceLogsPage() {
 
   useEffect(() => {
     gql<{ service: { containers: Container[] } }>(`
-      query ServiceContainers($id: ID!) {
+      query ServiceContainers($id: String!) {
         service(id: $id) {
           containers {
             id

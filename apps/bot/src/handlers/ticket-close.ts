@@ -6,8 +6,13 @@ import {
   ChannelType,
 } from "discord.js";
 import { eq } from "drizzle-orm";
-import { type Database, tickets, guildSettings, ticketHelperRoles } from "@digi/db";
-import { openTicketChannels } from "./ticket-open.js";
+import {
+  type Database,
+  tickets,
+  guildSettings,
+  ticketHelperRoles,
+} from "@digi/db";
+import { openTicketChannels } from "./ticket-open";
 
 export async function closeTicket(
   channelId: string,
@@ -15,7 +20,7 @@ export async function closeTicket(
   db: Database,
   client: Client,
   dashboardUrl: string,
-  reason?: string
+  reason?: string,
 ): Promise<{ success: boolean; error?: string }> {
   const ticket = await db.query.tickets.findFirst({
     where: eq(tickets.channelId, channelId),
@@ -45,7 +50,7 @@ export async function closeTicket(
       const member = guild?.members.cache.get(closerDiscordUserId);
       const helperRoleIds = settings.helperRoles.map((r) => r.roleId);
       const hasHelperRole = member?.roles.cache.some((r) =>
-        helperRoleIds.includes(r.id)
+        helperRoleIds.includes(r.id),
       );
 
       if (!hasHelperRole) {
@@ -76,7 +81,7 @@ export async function closeTicket(
 
   // Lock channel and send embed
   const guild = client.guilds.cache.find((g) =>
-    g.channels.cache.has(channelId)
+    g.channels.cache.has(channelId),
   );
   const channel = guild?.channels.cache.get(channelId);
 
@@ -94,7 +99,7 @@ export async function closeTicket(
           `\n[View transcript →](${dashboardUrl}/tickets/${ticket.id})`,
         ]
           .filter(Boolean)
-          .join("\n")
+          .join("\n"),
       )
       .setColor(0xef4444)
       .setTimestamp();

@@ -38,6 +38,7 @@ export function createAuth(config: AuthConfig) {
       "http://localhost:3002",
       "http://localhost:3003",
       "http://app.localhost",
+      "http://support.localhost",
       "http://admin.localhost",
       "http://bot.localhost",
       "http://localhost",
@@ -55,8 +56,7 @@ export function createAuth(config: AuthConfig) {
         return generateId(prefix as Parameters<typeof generateId>[0]);
       },
       crossSubdomainCookies: {
-        enabled: true,
-        domain: "localhost",
+        enabled: false,
       },
       defaultCookieAttributes: {
         sameSite: "lax",

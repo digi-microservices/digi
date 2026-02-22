@@ -1,5 +1,13 @@
-import { query, mutate } from "../lib/api.js";
-import { colors, success, error, log, newline, table, spinner } from "../lib/output.js";
+import { query, mutate } from "../lib/api";
+import {
+  colors,
+  success,
+  error,
+  log,
+  newline,
+  table,
+  spinner,
+} from "../lib/output";
 
 interface EnvVar {
   key: string;
@@ -34,7 +42,9 @@ async function listEnv(serviceId: string): Promise<void> {
 
     if (data.serviceEnvVars.length === 0) {
       log("\nNo environment variables set.");
-      log(`Use ${colors.bold("digi env set <serviceId> KEY=VALUE")} to add some.`);
+      log(
+        `Use ${colors.bold("digi env set <serviceId> KEY=VALUE")} to add some.`,
+      );
       return;
     }
 
@@ -46,14 +56,18 @@ async function listEnv(serviceId: string): Promise<void> {
     newline();
   } catch (err) {
     spin.stop();
-    error(`Failed to list env vars: ${err instanceof Error ? err.message : String(err)}`);
+    error(
+      `Failed to list env vars: ${err instanceof Error ? err.message : String(err)}`,
+    );
     process.exit(1);
   }
 }
 
 async function setEnv(serviceId: string, pairs: string[]): Promise<void> {
   if (!serviceId) {
-    error("Service ID is required. Usage: digi env set <serviceId> KEY=VALUE [KEY=VALUE...]");
+    error(
+      "Service ID is required. Usage: digi env set <serviceId> KEY=VALUE [KEY=VALUE...]",
+    );
     process.exit(1);
   }
 
@@ -95,7 +109,9 @@ async function setEnv(serviceId: string, pairs: string[]): Promise<void> {
     }
   } catch (err) {
     spin.stop();
-    error(`Failed to set env vars: ${err instanceof Error ? err.message : String(err)}`);
+    error(
+      `Failed to set env vars: ${err instanceof Error ? err.message : String(err)}`,
+    );
     process.exit(1);
   }
 }

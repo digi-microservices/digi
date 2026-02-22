@@ -15,7 +15,7 @@ export interface TopBarProps {
 
 export function TopBar({ breadcrumbs = [], user, onSignOut }: TopBarProps) {
   return (
-    <header className="fixed left-56 right-0 top-0 z-30 flex h-14 items-center justify-between border-b border-white/[0.06] bg-neutral-950/80 px-6 backdrop-blur-md">
+    <header className="fixed left-56 right-0 top-0 z-30 flex h-14 items-center justify-between border-b border-white/[0.06] bg-charcoal px-6 backdrop-blur-md">
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-1.5 text-sm">
         {breadcrumbs.map((item, i) => (

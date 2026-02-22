@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
 import { env } from "~/env";
 
@@ -19,37 +18,51 @@ export function LogViewer({ containerId }: LogViewerProps) {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const wsUrl = env.NEXT_PUBLIC_API_URL.replace(/^http/, "ws") + "/graphql";
+    let cancelled = false;
+
+    const wsUrl =
+      env.NEXT_PUBLIC_LOCAL_API_URL.replace(/^https/, "wss")
+        .replace(/^http/, "ws")
+        .replace(/\/$/, "") + "/graphql";
+
     const ws = new WebSocket(wsUrl, "graphql-transport-ws");
     wsRef.current = ws;
 
     ws.onopen = () => {
-      setConnected(true);
+      if (cancelled) {
+        ws.close();
+        return;
+      }
       ws.send(JSON.stringify({ type: "connection_init" }));
-
-      ws.send(
-        JSON.stringify({
-          id: "logs",
-          type: "subscribe",
-          payload: {
-            query: `subscription ContainerLogs($containerId: ID!) {
-              containerLogs(containerId: $containerId) {
-                timestamp
-                message
-              }
-            }`,
-            variables: { containerId },
-          },
-        }),
-      );
     };
 
     ws.onmessage = (event) => {
+      if (cancelled) return;
       try {
         const data = JSON.parse(event.data as string) as {
           type: string;
           payload?: { data?: { containerLogs?: LogEntry } };
         };
+
+        if (data.type === "connection_ack") {
+          setConnected(true);
+          ws.send(
+            JSON.stringify({
+              id: "logs",
+              type: "subscribe",
+              payload: {
+                query: `subscription ContainerLogs($containerId: ID!) {
+                  containerLogs(containerId: $containerId) {
+                    timestamp
+                    message
+                  }
+                }`,
+                variables: { containerId },
+              },
+            }),
+          );
+        }
+
         if (data.type === "next" && data.payload?.data?.containerLogs) {
           setLogs((prev) => [...prev, data.payload!.data!.containerLogs!]);
         }
@@ -59,14 +72,15 @@ export function LogViewer({ containerId }: LogViewerProps) {
     };
 
     ws.onclose = () => {
-      setConnected(false);
+      if (!cancelled) setConnected(false);
     };
 
     ws.onerror = () => {
-      setConnected(false);
+      if (!cancelled) setConnected(false);
     };
 
     return () => {
+      cancelled = true;
       ws.close();
     };
   }, [containerId]);
@@ -78,19 +92,22 @@ export function LogViewer({ containerId }: LogViewerProps) {
   }, [logs]);
 
   return (
-    <div className="flex flex-col rounded-xl border border-neutral-800 bg-neutral-950 overflow-hidden">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.02]">
       <div className="flex items-center justify-between border-b border-neutral-800 px-4 py-2">
         <span className="text-xs font-medium text-neutral-400">Logs</span>
         <span
-          className={`flex items-center gap-1.5 text-xs ${connected ? "text-green-400" : "text-neutral-500"}`}
+          className={`flex items-center gap-1.5 text-xs ${
+            connected ? "text-green-400" : "text-neutral-500"
+          }`}
         >
           <span
-            className={`h-1.5 w-1.5 rounded-full ${connected ? "bg-green-400" : "bg-neutral-500"}`}
+            className={`h-1.5 w-1.5 rounded-full ${
+              connected ? "bg-green-400" : "bg-neutral-500"
+            }`}
           />
           {connected ? "Connected" : "Disconnected"}
         </span>
       </div>
-
       <div
         ref={scrollRef}
         className="h-[500px] overflow-y-auto p-4 font-mono text-sm leading-relaxed"
@@ -103,7 +120,7 @@ export function LogViewer({ containerId }: LogViewerProps) {
               <span className="shrink-0 text-neutral-600">
                 {new Date(log.timestamp).toLocaleTimeString()}
               </span>
-              <span className="text-neutral-300 whitespace-pre-wrap break-all">
+              <span className="whitespace-pre-wrap break-all text-neutral-300">
                 {log.message}
               </span>
             </div>

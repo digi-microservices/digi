@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
   --color-charcoal: oklch(0.2372 0.0095 285.65);
-  --color-digi-blue: #3A7DFF;
-  --color-digi-blue-hover: #2E6BE6;
+  --color-digi-blue: #3a7dff;
+  --color-digi-blue-hover: #2e6be6;
   --color-surface: #0f0f0f;
   --color-surface-light: #1a1a1a;
   --color-surface-lighter: #242424;
@@ -14,7 +14,9 @@
 }
 
 @layer base {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -25,13 +27,17 @@
   }
 
   body {
-    @apply bg-neutral-950 text-white;
-    font-family: 'DM Sans', sans-serif;
+    @apply bg-charcoal text-white;
+    font-family: "DM Sans", sans-serif;
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, .font-heading {
-    font-family: var(--font-cal, 'DM Sans'), sans-serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-heading {
+    font-family: var(--font-cal, "DM Sans"), sans-serif;
   }
 }
 
@@ -56,14 +62,32 @@
 
 /* Stagger animations */
 @keyframes digi-fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.digi-fade-1 { opacity: 0; animation: digi-fadeUp 0.5s 0.05s ease forwards; }
-.digi-fade-2 { opacity: 0; animation: digi-fadeUp 0.5s 0.15s ease forwards; }
-.digi-fade-3 { opacity: 0; animation: digi-fadeUp 0.5s 0.25s ease forwards; }
-.digi-fade-4 { opacity: 0; animation: digi-fadeUp 0.5s 0.35s ease forwards; }
+.digi-fade-1 {
+  opacity: 0;
+  animation: digi-fadeUp 0.5s 0.05s ease forwards;
+}
+.digi-fade-2 {
+  opacity: 0;
+  animation: digi-fadeUp 0.5s 0.15s ease forwards;
+}
+.digi-fade-3 {
+  opacity: 0;
+  animation: digi-fadeUp 0.5s 0.25s ease forwards;
+}
+.digi-fade-4 {
+  opacity: 0;
+  animation: digi-fadeUp 0.5s 0.35s ease forwards;
+}
 
 .digi-noise {
   position: fixed;
@@ -72,4 +96,33 @@
   z-index: 9999;
   opacity: 0.35;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+.h-5 {
+  height: 1.25rem;
+}
+
+.w-5 {
+  width: 1.25rem;
+}
+
+.px-5 {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.ml-1\.5 {
+  margin-left: 0.375rem;
+}
+
+.h-8 {
+  height: 2rem;
+}
+
+.w-8 {
+  width: 2rem;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

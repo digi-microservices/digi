@@ -1,24 +1,12 @@
-interface GraphQLResponse<T = unknown> {
-  data?: T;
-  errors?: Array<{ message: string; path?: string[] }>;
-}
+const GRAPHQL_URL = `/api/graphql`;
 
 export async function graphqlClient<T = unknown>(
   query: string,
   variables?: Record<string, unknown>,
-  token?: string,
-): Promise<GraphQLResponse<T>> {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
-  const response = await fetch("/api/graphql", {
+): Promise<T> {
+  const response = await fetch(GRAPHQL_URL, {
     method: "POST",
-    headers,
+    headers: { "Content-Type": "application/json" },
     credentials: "include",
     body: JSON.stringify({ query, variables }),
   });
@@ -27,5 +15,14 @@ export async function graphqlClient<T = unknown>(
     throw new Error(`GraphQL request failed: ${response.statusText}`);
   }
 
-  return response.json() as Promise<GraphQLResponse<T>>;
+  const json = (await response.json()) as {
+    data: T;
+    errors?: { message: string }[];
+  };
+
+  if (json.errors) {
+    throw new Error(json.errors.map((e) => e.message).join(", "));
+  }
+
+  return json.data;
 }

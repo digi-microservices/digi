@@ -34,3 +34,7 @@ http://admin.localhost {
 http://mail.localhost {
 	reverse_proxy mailpit:8025
 }
+
+http://support.localhost {
+	reverse_proxy host.docker.internal:3003
+}

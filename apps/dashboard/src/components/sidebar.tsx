@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "motion/react";
 import { gql } from "~/lib/graphql";
 
 interface ServiceItem {
@@ -11,17 +12,18 @@ interface ServiceItem {
   status: string;
 }
 
-const navLinks = [
-  { href: "/services", label: "Services", icon: ServerIcon },
-  { href: "/billing", label: "Billing", icon: CreditCardIcon },
-  { href: "/settings", label: "Settings", icon: GearIcon },
-];
-
 const statusColors: Record<string, string> = {
   running: "bg-green-500",
   deploying: "bg-yellow-500",
   stopped: "bg-neutral-500",
   error: "bg-red-500",
+};
+
+const statusLabels: Record<string, string> = {
+  running: "Running",
+  deploying: "Deploying",
+  stopped: "Stopped",
+  error: "Error",
 };
 
 export function Sidebar() {
@@ -37,26 +39,33 @@ export function Sidebar() {
       .catch(() => {});
   }, []);
 
+  const runningCount = services.filter((s) => s.status === "running").length;
+  const errorCount = services.filter((s) => s.status === "error").length;
+
   return (
-    <aside className="fixed left-0 top-14 z-30 flex h-[calc(100vh-3.5rem)] w-56 flex-col border-r border-white/[0.06] bg-neutral-950">
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
-        {navLinks.map(({ href, label, icon: Icon }) => {
-          const active = href === "/services"
-            ? pathname === "/services" || pathname === "/services/new"
-            : pathname.startsWith(href);
-          return (
-            <div key={href}>
-              <Link
-                href={href}
-                className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition ${
-                  active
-                    ? "bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20"
-                    : "text-neutral-500 hover:bg-white/[0.04] hover:text-neutral-200"
-                }`}
-              >
-                <Icon className={`h-4 w-4 shrink-0 ${active ? "text-blue-400" : "text-neutral-600"}`} />
-                {label}
-                {href === "/services" && services.length > 0 && (
+    <aside className="fixed left-0 top-14 z-30 flex h-[calc(100vh-3.5rem)] w-56 flex-col border-r border-white/[0.06] bg-charcoal">
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        {/* ── Main navigation ── */}
+        <div className="space-y-0.5">
+          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-neutral-600">Navigation</p>
+
+          {/* Services link */}
+          <div>
+            <Link
+              href="/services"
+              className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition ${
+                pathname === "/services" || pathname === "/services/new"
+                  ? "bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20"
+                  : "text-neutral-500 hover:bg-white/[0.04] hover:text-neutral-200"
+              }`}
+            >
+              <ServerIcon className={`h-4 w-4 shrink-0 ${pathname === "/services" || pathname === "/services/new" ? "text-blue-400" : "text-neutral-600"}`} />
+              Services
+              {services.length > 0 && (
+                <span className="ml-auto flex items-center gap-1.5">
+                  <span className="rounded-md bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-neutral-400">
+                    {services.length}
+                  </span>
                   <button
                     type="button"
                     onClick={(e) => {
@@ -64,47 +73,90 @@ export function Sidebar() {
                       e.stopPropagation();
                       setServicesOpen(!servicesOpen);
                     }}
-                    className="ml-auto text-neutral-600 hover:text-neutral-400"
+                    className="text-neutral-600 hover:text-neutral-400"
                   >
                     <ChevronIcon className={`h-3.5 w-3.5 transition ${servicesOpen ? "rotate-90" : ""}`} />
                   </button>
-                )}
-              </Link>
-
-              {/* Collapsible services list */}
-              {href === "/services" && servicesOpen && services.length > 0 && (
-                <div className="ml-4 mt-1 space-y-0.5 border-l border-white/[0.06] pl-3">
-                  {services.map((svc) => {
-                    const svcActive = pathname === `/services/${svc.id}`;
-                    return (
-                      <Link
-                        key={svc.id}
-                        href={`/services/${svc.id}`}
-                        className={`flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs transition ${
-                          svcActive
-                            ? "text-blue-400"
-                            : "text-neutral-500 hover:text-neutral-300"
-                        }`}
-                      >
-                        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusColors[svc.status] ?? "bg-neutral-600"}`} />
-                        <span className="truncate">{svc.name}</span>
-                      </Link>
-                    );
-                  })}
-                  <Link
-                    href="/services/new"
-                    className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-neutral-600 transition hover:text-neutral-400"
-                  >
-                    <PlusIcon className="h-3 w-3" />
-                    New service
-                  </Link>
-                </div>
+                </span>
               )}
-            </div>
-          );
-        })}
+            </Link>
 
-        <div className="pt-2">
+            {/* Collapsible services list */}
+            <AnimatePresence initial={false}>
+              {servicesOpen && services.length > 0 && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="ml-4 mt-1 overflow-hidden border-l border-white/[0.06] pl-3"
+                >
+                  <div className="space-y-0.5">
+                    {services.map((svc) => {
+                      const svcActive = pathname === `/services/${svc.id}` || pathname.startsWith(`/services/${svc.id}/`);
+                      return (
+                        <Link
+                          key={svc.id}
+                          href={`/services/${svc.id}`}
+                          className={`group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs transition ${
+                            svcActive
+                              ? "bg-white/[0.04] text-blue-400"
+                              : "text-neutral-500 hover:bg-white/[0.02] hover:text-neutral-300"
+                          }`}
+                        >
+                          <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusColors[svc.status] ?? "bg-neutral-600"}`} title={statusLabels[svc.status] ?? svc.status} />
+                          <span className="truncate">{svc.name}</span>
+                        </Link>
+                      );
+                    })}
+                    <Link
+                      href="/services/new"
+                      className={`flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs transition ${
+                        pathname === "/services/new"
+                          ? "text-blue-400"
+                          : "text-neutral-600 hover:text-neutral-400"
+                      }`}
+                    >
+                      <PlusIcon className="h-3 w-3" />
+                      New service
+                    </Link>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Billing */}
+          <Link
+            href="/billing"
+            className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition ${
+              pathname.startsWith("/billing")
+                ? "bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20"
+                : "text-neutral-500 hover:bg-white/[0.04] hover:text-neutral-200"
+            }`}
+          >
+            <CreditCardIcon className={`h-4 w-4 shrink-0 ${pathname.startsWith("/billing") ? "text-blue-400" : "text-neutral-600"}`} />
+            Billing
+          </Link>
+
+          {/* Settings */}
+          <Link
+            href="/settings"
+            className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition ${
+              pathname === "/settings"
+                ? "bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20"
+                : "text-neutral-500 hover:bg-white/[0.04] hover:text-neutral-200"
+            }`}
+          >
+            <GearIcon className={`h-4 w-4 shrink-0 ${pathname === "/settings" ? "text-blue-400" : "text-neutral-600"}`} />
+            Settings
+          </Link>
+        </div>
+
+        {/* ── Developer section ── */}
+        <div className="mt-6 space-y-0.5">
+          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-neutral-600">Developer</p>
+
           <Link
             href="/settings/tokens"
             className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition ${
@@ -116,7 +168,50 @@ export function Sidebar() {
             <KeyIcon className={`h-4 w-4 shrink-0 ${pathname.startsWith("/settings/tokens") ? "text-blue-400" : "text-neutral-600"}`} />
             API Tokens
           </Link>
+
+          <a
+            href="/docs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-neutral-500 transition hover:bg-white/[0.04] hover:text-neutral-200"
+          >
+            <BookIcon className="h-4 w-4 shrink-0 text-neutral-600" />
+            Docs
+          </a>
         </div>
+
+        {/* ── Status summary ── */}
+        {services.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="mt-6 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-600">Status</p>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1.5 text-neutral-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                  Running
+                </span>
+                <span className="tabular-nums text-neutral-300">{runningCount}</span>
+              </div>
+              {errorCount > 0 && (
+                <div className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-1.5 text-neutral-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                    Errors
+                  </span>
+                  <span className="tabular-nums text-red-400">{errorCount}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-neutral-500">Total</span>
+                <span className="tabular-nums text-neutral-300">{services.length}</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </nav>
     </aside>
   );
@@ -167,6 +262,14 @@ function PlusIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+  );
+}
+
+function BookIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
     </svg>
   );
 }

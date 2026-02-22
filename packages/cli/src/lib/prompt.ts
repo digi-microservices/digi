@@ -1,4 +1,4 @@
-import { colors } from "./output.js";
+import { colors } from "./output";
 
 /**
  * Read a line of input from stdin.
@@ -66,7 +66,8 @@ export async function select(
   message: string,
   options: string[],
 ): Promise<string> {
-  if (options.length === 0) throw new Error("select() requires at least one option");
+  if (options.length === 0)
+    throw new Error("select() requires at least one option");
 
   process.stdout.write(`  ${colors.bold(message)}\n\n`);
 

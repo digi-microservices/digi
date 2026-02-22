@@ -1,9 +1,9 @@
 import { type Client } from "discord.js";
 import { type Database } from "@digi/db";
 import { type RedisClient } from "@digi/redis";
-import { registerReadyEvent } from "./ready.js";
-import { registerInteractionCreateEvent } from "./interactionCreate.js";
-import { registerMessageCreateEvent } from "./messageCreate.js";
+import { registerReadyEvent } from "./ready";
+import { registerInteractionCreateEvent } from "./interactionCreate";
+import { registerMessageCreateEvent } from "./messageCreate";
 
 interface BotDeps {
   db: Database;

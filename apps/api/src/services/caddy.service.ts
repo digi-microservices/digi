@@ -2,6 +2,8 @@
 // Both the Master Caddy and VM-level Caddy instances expose
 // the Caddy admin API (default port 2019).
 
+import { env } from "../env";
+
 export interface CaddyRoute {
   subdomain: string;
   upstreamHost: string;
@@ -33,13 +35,11 @@ export async function addRoute(
 ): Promise<void> {
   const config = {
     "@id": `route-${route.subdomain}`,
-    match: [{ host: [route.subdomain] }],
+    match: [{ host: [`${route.subdomain}.${env.PLATFORM_DOMAIN}`] }],
     handle: [
       {
         handler: "reverse_proxy",
-        upstreams: [
-          { dial: `${route.upstreamHost}:${route.upstreamPort}` },
-        ],
+        upstreams: [{ dial: `${route.upstreamHost}:${route.upstreamPort}` }],
       },
     ],
   };
@@ -78,14 +78,14 @@ export async function addMasterRoute(
 }
 
 // Add a route on a VM-level Caddy to forward traffic to a local container
-export async function addVmRoute(
-  vmCaddyUrl: string,
-  subdomain: string,
-  containerPort: number
-): Promise<void> {
-  await addRoute(vmCaddyUrl, {
-    subdomain,
-    upstreamHost: "127.0.0.1",
-    upstreamPort: containerPort,
-  });
-}
+// export async function addVmRoute(
+//   vmCaddyUrl: string,
+//   subdomain: string,
+//   containerPort: number
+// ): Promise<void> {
+//   await addRoute(vmCaddyUrl, {
+//     subdomain,
+//     upstreamHost: "127.0.0.1",
+//     upstreamPort: containerPort,
+//   });
+// }

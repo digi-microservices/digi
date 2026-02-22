@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { gql } from "~/lib/graphql";
 import { authClient } from "~/lib/auth-client";
 import { toast } from "sonner";
+import { Input } from "@digi/ui";
 
 interface User {
   id: string;
@@ -25,7 +27,6 @@ const tabs: { id: Tab; label: string }[] = [
   { id: "profile", label: "Profile" },
   { id: "security", label: "Security" },
   { id: "tokens", label: "API Tokens" },
-  { id: "appearance", label: "Appearance" },
 ];
 
 export default function SettingsPage() {
@@ -53,7 +54,7 @@ export default function SettingsPage() {
       <h1 className="mb-6 text-2xl font-bold text-white">Account Settings</h1>
 
       {/* Tab navigation */}
-      <div className="mb-6 flex gap-1 rounded-xl border border-neutral-800 bg-neutral-900 p-1">
+      <div className="mb-6 flex gap-1 rounded-xl border border-white/[0.08] bg-white/[0.02] p-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -69,17 +70,35 @@ export default function SettingsPage() {
         ))}
       </div>
 
-      {activeTab === "profile" && <ProfileTab user={user} onUpdate={setUser} />}
-      {activeTab === "security" && <SecurityTab />}
-      {activeTab === "tokens" && <TokensTab />}
-      {activeTab === "appearance" && <AppearanceTab />}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2 }}
+        >
+          {activeTab === "profile" && (
+            <ProfileTab user={user} onUpdate={setUser} />
+          )}
+          {activeTab === "security" && <SecurityTab />}
+          {activeTab === "tokens" && <TokensTab />}
+          {activeTab === "appearance" && <AppearanceTab />}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
 
 /* ─── Profile Tab ──────────────────────────────────────────────── */
 
-function ProfileTab({ user, onUpdate }: { user: User | null; onUpdate: (u: User) => void }) {
+function ProfileTab({
+  user,
+  onUpdate,
+}: {
+  user: User | null;
+  onUpdate: (u: User) => void;
+}) {
   const [name, setName] = useState(user?.name ?? "");
   const [saving, setSaving] = useState(false);
 
@@ -98,7 +117,7 @@ function ProfileTab({ user, onUpdate }: { user: User | null; onUpdate: (u: User)
   }
 
   return (
-    <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-6">
+    <section className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
       <div className="mb-6 flex items-center gap-4">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-500/10 text-lg font-bold text-blue-400 ring-1 ring-blue-500/20">
           {user?.name?.charAt(0).toUpperCase() ?? "?"}
@@ -111,8 +130,10 @@ function ProfileTab({ user, onUpdate }: { user: User | null; onUpdate: (u: User)
 
       <div className="space-y-4">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-neutral-300">Name</label>
-          <input
+          <label className="mb-1.5 block text-sm font-medium text-neutral-300">
+            Name
+          </label>
+          <Input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -120,15 +141,21 @@ function ProfileTab({ user, onUpdate }: { user: User | null; onUpdate: (u: User)
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-neutral-300">Email</label>
-          <p className="rounded-lg border border-neutral-800 bg-neutral-800/50 px-4 py-2.5 text-neutral-400">
+          <label className="mb-1.5 block text-sm font-medium text-neutral-300">
+            Email
+          </label>
+          <p className="rounded-lg border border-white/[0.08] bg-neutral-800/50 px-4 py-2.5 text-neutral-400">
             {user?.email}
           </p>
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-neutral-300">Member since</label>
+          <label className="mb-1.5 block text-sm font-medium text-neutral-300">
+            Member since
+          </label>
           <p className="text-sm text-neutral-400">
-            {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}
+            {user?.createdAt
+              ? new Date(user.createdAt).toLocaleDateString()
+              : "—"}
           </p>
         </div>
         <button
@@ -197,12 +224,16 @@ function SecurityTab() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-6">
-        <h2 className="mb-4 text-lg font-semibold text-white">Change Password</h2>
+      <section className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
+        <h2 className="mb-4 text-lg font-semibold text-white">
+          Change Password
+        </h2>
         <div className="space-y-3">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-neutral-300">Current password</label>
-            <input
+            <label className="mb-1.5 block text-sm font-medium text-neutral-300">
+              Current password
+            </label>
+            <Input
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
@@ -210,8 +241,10 @@ function SecurityTab() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-neutral-300">New password</label>
-            <input
+            <label className="mb-1.5 block text-sm font-medium text-neutral-300">
+              New password
+            </label>
+            <Input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -219,8 +252,10 @@ function SecurityTab() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-neutral-300">Confirm new password</label>
-            <input
+            <label className="mb-1.5 block text-sm font-medium text-neutral-300">
+              Confirm new password
+            </label>
+            <Input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -229,7 +264,12 @@ function SecurityTab() {
           </div>
           <button
             onClick={handleChangePassword}
-            disabled={changingPassword || !currentPassword || !newPassword || !confirmPassword}
+            disabled={
+              changingPassword ||
+              !currentPassword ||
+              !newPassword ||
+              !confirmPassword
+            }
             className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {changingPassword ? "Changing..." : "Change Password"}
@@ -237,12 +277,14 @@ function SecurityTab() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-6">
+      <section className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
         <h2 className="mb-4 text-lg font-semibold text-white">Change Email</h2>
         <div className="space-y-3">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-neutral-300">New email address</label>
-            <input
+            <label className="mb-1.5 block text-sm font-medium text-neutral-300">
+              New email address
+            </label>
+            <Input
               type="email"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
@@ -288,9 +330,12 @@ function TokensTab() {
     if (!newName.trim()) return;
     setCreating(true);
     try {
-      const data = await gql<{ generateApiToken: { token: string } }>(`
+      const data = await gql<{ generateApiToken: { token: string } }>(
+        `
         mutation($name: String!) { generateApiToken(name: $name) { token } }
-      `, { name: newName });
+      `,
+        { name: newName },
+      );
       setNewToken(data.generateApiToken.token);
       setNewName("");
       await fetchTokens();
@@ -338,8 +383,13 @@ function TokensTab() {
             Token created! Copy it now — it won't be shown again.
           </p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 break-all rounded-lg bg-black/50 px-3 py-2 text-xs text-white">{newToken}</code>
-            <button onClick={handleCopy} className="shrink-0 rounded-lg border border-neutral-700 px-3 py-2 text-xs text-neutral-400 hover:text-white">
+            <code className="flex-1 break-all rounded-lg bg-black/50 px-3 py-2 text-xs text-white">
+              {newToken}
+            </code>
+            <button
+              onClick={handleCopy}
+              className="shrink-0 rounded-lg border border-neutral-700 px-3 py-2 text-xs text-neutral-400 hover:text-white"
+            >
               {copied ? "Copied!" : "Copy"}
             </button>
           </div>
@@ -347,15 +397,15 @@ function TokensTab() {
       )}
 
       {/* Create token */}
-      <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-6">
+      <section className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
         <h2 className="mb-4 text-lg font-semibold text-white">Create Token</h2>
         <div className="flex gap-2">
-          <input
+          <Input
             placeholder="Token name (e.g. CI/CD)"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-            className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white placeholder:text-neutral-500 outline-none focus:border-blue-500"
+            className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white outline-none placeholder:text-neutral-500 focus:border-blue-500"
           />
           <button
             onClick={handleCreate}
@@ -368,19 +418,23 @@ function TokensTab() {
       </section>
 
       {/* Token list */}
-      <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-6">
+      <section className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
         <h2 className="mb-4 text-lg font-semibold text-white">Active Tokens</h2>
         {tokens.length === 0 ? (
           <p className="text-sm text-neutral-500">No API tokens yet.</p>
         ) : (
           <div className="space-y-3">
             {tokens.map((token) => (
-              <div key={token.id} className="flex items-center justify-between rounded-lg border border-neutral-800 px-4 py-3">
+              <div
+                key={token.id}
+                className="flex items-center justify-between rounded-lg border border-white/[0.08] px-4 py-3"
+              >
                 <div>
                   <p className="text-sm font-medium text-white">{token.name}</p>
                   <p className="text-xs text-neutral-500">
                     Created {new Date(token.createdAt).toLocaleDateString()}
-                    {token.lastUsedAt && ` · Last used ${new Date(token.lastUsedAt).toLocaleDateString()}`}
+                    {token.lastUsedAt &&
+                      ` · Last used ${new Date(token.lastUsedAt).toLocaleDateString()}`}
                   </p>
                 </div>
                 <button
@@ -419,10 +473,11 @@ function AppearanceTab() {
   }
 
   return (
-    <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-6">
+    <section className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
       <h2 className="mb-4 text-lg font-semibold text-white">Theme</h2>
       <p className="mb-4 text-sm text-neutral-400">
-        Choose your preferred appearance. Light mode styling is a work in progress.
+        Choose your preferred appearance. Light mode styling is a work in
+        progress.
       </p>
       <div className="flex gap-3">
         <button
@@ -454,16 +509,36 @@ function AppearanceTab() {
 
 function MoonIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
+      />
     </svg>
   );
 }
 
 function SunIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+      />
     </svg>
   );
 }

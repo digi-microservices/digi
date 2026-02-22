@@ -10,9 +10,7 @@
     "light": "#6BA3FF",
     "dark": "#2E6BE6"
   },
-  "topbarLinks": [
-    { "name": "Dashboard", "url": "https://app.digi.run" }
-  ],
+  "topbarLinks": [{ "name": "Dashboard", "url": "https://app.digi.run" }],
   "topbarCtaButton": {
     "name": "Get Started",
     "url": "https://app.digi.run/register"
@@ -44,11 +42,7 @@
     },
     {
       "group": "API",
-      "pages": [
-        "api/overview",
-        "api/authentication",
-        "api/graphql"
-      ]
+      "pages": ["api/overview", "api/authentication", "api/graphql"]
     },
     {
       "group": "Self-Hosting",
@@ -61,6 +55,6 @@
     }
   ],
   "footerSocials": {
-    "github": "https://github.com/digi-run/digi"
+    "github": "https://github.com/digi-microservices/digi"
   }
 }

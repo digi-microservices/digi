@@ -9,15 +9,15 @@ import {
 import { type Database } from "@digi/db";
 import { type Cache } from "@digi/redis/cache";
 import { type PubSub, Channels } from "@digi/redis/pubsub";
-import * as docker from "./docker.service.js";
-import * as caddy from "./caddy.service.js";
-import { env } from "../env.js";
+import * as docker from "./docker.service";
+import * as caddy from "./caddy.service";
+import { env } from "../env";
 
 export async function executeDeploy(
   db: Database,
   cache: Cache,
   pubsub: PubSub,
-  payload: { serviceId: string; deploymentId: string }
+  payload: { serviceId: string; deploymentId: string },
 ): Promise<void> {
   const { serviceId, deploymentId } = payload;
 
@@ -54,10 +54,10 @@ export async function executeDeploy(
       with: { services: true },
     });
 
-    vm = allVms.sort(
-      (a, b) =>
-        (a.services?.length ?? 0) - (b.services?.length ?? 0)
-    )[0] ?? null;
+    vm =
+      allVms.sort(
+        (a, b) => (a.services?.length ?? 0) - (b.services?.length ?? 0),
+      )[0] ?? null;
 
     if (!vm) {
       throw new Error("No available VMs. Provision a new VM first.");
@@ -93,7 +93,7 @@ export async function executeDeploy(
         ? "postgres:16-alpine"
         : container.type === "redis"
           ? "redis:7-alpine"
-          : service.dockerImage ?? "");
+          : (service.dockerImage ?? ""));
 
     if (!image) {
       // GitHub source — would use Railpack here
@@ -115,7 +115,13 @@ export async function executeDeploy(
       ports: [
         {
           host: externalPort,
-          container: container.internalPort ?? (container.type === "postgres" ? 5432 : container.type === "redis" ? 6379 : 3000),
+          container:
+            container.internalPort ??
+            (container.type === "postgres"
+              ? 5432
+              : container.type === "redis"
+                ? 6379
+                : 3000),
         },
       ],
       memory: (container.resourceLimits as Record<string, string>)?.memory,
@@ -134,20 +140,22 @@ export async function executeDeploy(
       .where(eq(containers.id, container.id));
 
     // Add route on VM Caddy
+    console.log(container.subdomain, vm.ipAddress, externalPort);
     if (container.subdomain) {
       const vmCaddyUrl = `http://${vm.ipAddress}:2019`;
-      await caddy.addVmRoute(
-        vmCaddyUrl,
-        container.subdomain,
-        externalPort
-      );
+      // await caddy.addVmRoute(
+      //   vmCaddyUrl,
+      //   container.subdomain,
+      //   externalPort
+      // );
 
       // Add route on Master Caddy
       if (env.MASTER_CADDY_URL) {
         await caddy.addMasterRoute(
           env.MASTER_CADDY_URL,
           container.subdomain,
-          vm.ipAddress
+          vm.ipAddress,
+          externalPort,
         );
       }
     }

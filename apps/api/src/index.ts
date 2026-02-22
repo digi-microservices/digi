@@ -9,14 +9,14 @@ import {
   createPubSub,
   createJobQueue,
 } from "@digi/redis";
-import { env } from "./env.js";
-import { createContextFactory } from "./context.js";
-import { schema } from "./schema/index.js";
-import { createStripeWebhookHandler } from "./webhooks/stripe.js";
-import { startJobWorker } from "./queue/worker.js";
-import { startPasswordRotation } from "./services/password.service.js";
-import { mountCliAuthRoutes } from "./routes/cli-auth.js";
-import { checkRateLimit, API_RATE_LIMIT } from "./middleware/rate-limit.js";
+import { env } from "./env";
+import { createContextFactory } from "./context";
+import { schema } from "./schema/index";
+import { createStripeWebhookHandler } from "./webhooks/stripe";
+import { startJobWorker } from "./queue/worker";
+import { startPasswordRotation } from "./services/password.service";
+import { mountCliAuthRoutes } from "./routes/cli-auth";
+import { checkRateLimit, API_RATE_LIMIT } from "./middleware/rate-limit";
 
 // Initialize dependencies
 const db = createDb(env.DATABASE_URL);
@@ -71,6 +71,8 @@ const baseApp = new Elysia()
           "http://localhost:3000",
           "http://localhost:3001",
           "http://localhost:3002",
+          "http://localhost:3003",
+          "http://support.localhost",
         ]),
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization"],
@@ -101,7 +103,14 @@ const baseApp = new Elysia()
     const rl = await checkRateLimit(redis, `gql:${ip}`, API_RATE_LIMIT);
     if (!rl.allowed) {
       return new Response(
-        JSON.stringify({ errors: [{ message: "Too Many Requests", extensions: { code: "RATE_LIMITED" } }] }),
+        JSON.stringify({
+          errors: [
+            {
+              message: "Too Many Requests",
+              extensions: { code: "RATE_LIMITED" },
+            },
+          ],
+        }),
         {
           status: 429,
           headers: {
@@ -124,7 +133,11 @@ const baseApp = new Elysia()
   }));
 
 // Mount CLI auth routes
-const app = mountCliAuthRoutes(baseApp as unknown as Elysia, { auth, db, redis }).listen(env.PORT);
+const app = mountCliAuthRoutes(baseApp as unknown as Elysia, {
+  auth,
+  db,
+  redis,
+}).listen(env.PORT);
 
 // Start background processes
 startJobWorker(db, redis, pubsub, cache);

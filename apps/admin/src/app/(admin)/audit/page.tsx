@@ -24,7 +24,7 @@ export default function AuditPage() {
       query { auditLogs { id actorId actorType action resourceType resourceId ipAddress createdAt } }
     `)
       .then((res) => {
-        if (res.data) setLogs(res.data.auditLogs);
+        if (res.auditLogs) setLogs(res.auditLogs);
       })
       .catch(console.error)
       .finally(() => setLoading(false));

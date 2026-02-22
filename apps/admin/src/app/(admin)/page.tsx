@@ -32,7 +32,8 @@ export default function AdminOverviewPage() {
       }
     `)
       .then((res) => {
-        if (res.data) setStats(res.data.adminOverview);
+        //@ts-ignore
+        if (res.adminOverview) setStats(res.adminOverview);
       })
       .catch(console.error)
       .finally(() => setLoading(false));

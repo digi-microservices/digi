@@ -23,7 +23,7 @@ export async function handleSetupBuildServer(
   interaction: ChatInputCommandInteraction,
   db: Database
 ) {
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply();
 
   const guild = interaction.guild;
   if (!guild) {
@@ -64,17 +64,17 @@ export async function handleSetupBuildServer(
 
     // Create ANNOUNCEMENTS category
     const announcementsCategory = await guild.channels.create({
-      name: "ANNOUNCEMENTS",
+      name: "announcements",
       type: ChannelType.GuildCategory,
     });
     await guild.channels.create({
-      name: "github-pushes",
-      type: ChannelType.GuildNews,
+      name: "change-log",
+      type: ChannelType.GuildAnnouncement,
       parent: announcementsCategory.id,
     });
     const announcementsChannel = await guild.channels.create({
       name: "announcements",
-      type: ChannelType.GuildNews,
+      type: ChannelType.GuildAnnouncement,
       parent: announcementsCategory.id,
       permissionOverwrites: [
         {
@@ -87,7 +87,7 @@ export async function handleSetupBuildServer(
 
     // Create COMMUNITY category
     const communityCategory = await guild.channels.create({
-      name: "COMMUNITY",
+      name: "community",
       type: ChannelType.GuildCategory,
     });
     await guild.channels.create({
@@ -101,14 +101,14 @@ export async function handleSetupBuildServer(
       parent: communityCategory.id,
     });
     await guild.channels.create({
-      name: "community-support",
+      name: "support",
       type: ChannelType.GuildForum,
       parent: communityCategory.id,
     });
 
     // Create STAFF category
     const staffCategory = await guild.channels.create({
-      name: "STAFF",
+      name: "staff",
       type: ChannelType.GuildCategory,
       permissionOverwrites: [
         {
@@ -141,7 +141,7 @@ export async function handleSetupBuildServer(
 
     // Create TICKETS category
     const ticketsCategory = await guild.channels.create({
-      name: "TICKETS",
+      name: "tickets",
       type: ChannelType.GuildCategory,
       permissionOverwrites: [
         {

@@ -90,7 +90,7 @@ digi/
 ### 2. Install & Configure
 
 ```bash
-git clone https://github.com/digi-run/digi
+git clone https://github.com/digi-microservices/digi
 cd digi
 bun install
 cp .env.example .env
@@ -122,14 +122,14 @@ bun run seed:admin
 bun dev
 ```
 
-| App | URL | Description |
-|-----|-----|-------------|
-| Landing | http://localhost:3000 | Marketing site |
-| Dashboard | http://localhost:3001 | User dashboard |
-| Admin | http://localhost:3002 | Admin panel |
-| API | http://localhost:4000 | GraphQL API |
+| App                | URL                           | Description              |
+| ------------------ | ----------------------------- | ------------------------ |
+| Landing            | http://localhost:3000         | Marketing site           |
+| Dashboard          | http://localhost:3001         | User dashboard           |
+| Admin              | http://localhost:3002         | Admin panel              |
+| API                | http://localhost:4000         | GraphQL API              |
 | GraphQL Playground | http://localhost:4000/graphql | Interactive API explorer |
-| Mailpit | http://localhost:8025 | Email testing |
+| Mailpit            | http://localhost:8025         | Email testing            |
 
 ## SDK
 
@@ -148,9 +148,7 @@ const services = await digi.services.list();
 const deployment = await digi.services.deploy(services[0].id);
 
 // Manage environment variables
-await digi.env.set(services[0].id, [
-  { key: "NODE_ENV", value: "production" },
-]);
+await digi.env.set(services[0].id, [{ key: "NODE_ENV", value: "production" }]);
 ```
 
 ## CLI
@@ -175,27 +173,28 @@ digi logs my-api --follow
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Runtime | Bun |
-| API | ElysiaJS + GraphQL Yoga |
-| Frontend | Next.js 15, React 19, Tailwind CSS v4 |
-| Auth | better-auth |
-| Database | PostgreSQL + Drizzle ORM |
-| Cache/Queue | Redis (ioredis) |
-| Virtualisation | Proxmox VE REST API |
-| Containers | Docker (inside VMs) |
-| Routing | Caddy |
-| DNS | Cloudflare API |
-| Billing | Stripe |
-| Builds | Railpack buildpacks |
-| CLI | Bun standalone binary |
+| Layer          | Technology                            |
+| -------------- | ------------------------------------- |
+| Runtime        | Bun                                   |
+| API            | ElysiaJS + GraphQL Yoga               |
+| Frontend       | Next.js 15, React 19, Tailwind CSS v4 |
+| Auth           | better-auth                           |
+| Database       | PostgreSQL + Drizzle ORM              |
+| Cache/Queue    | Redis (ioredis)                       |
+| Virtualisation | Proxmox VE REST API                   |
+| Containers     | Docker (inside VMs)                   |
+| Routing        | Caddy                                 |
+| DNS            | Cloudflare API                        |
+| Billing        | Stripe                                |
+| Builds         | Railpack buildpacks                   |
+| CLI            | Bun standalone binary                 |
 
 ## Self-Hosting
 
 For production deployment on your own infrastructure, see the [Self-Hosting Guide](docs/self-hosting/overview.mdx).
 
 You'll need:
+
 - Proxmox VE cluster
 - Domain on Cloudflare
 - PostgreSQL + Redis

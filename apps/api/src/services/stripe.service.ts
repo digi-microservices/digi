@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { env } from "../env.js";
+import { env } from "../env";
 
 let stripeInstance: Stripe | null = null;
 
@@ -11,18 +11,30 @@ function getStripe(): Stripe {
   return stripeInstance;
 }
 
+export async function createBillingPortalSession(
+  customerId: string,
+  returnUrl: string,
+): Promise<string> {
+  const stripe = getStripe();
+  const session = await stripe.billingPortal.sessions.create({
+    customer: customerId,
+    return_url: returnUrl,
+  });
+  return session.url;
+}
+
 export async function createCheckoutSession(
   customerEmail: string,
   priceId: string,
-  metadata: Record<string, string>
+  metadata: Record<string, string>,
 ): Promise<{ url: string; sessionId: string }> {
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer_email: customerEmail,
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `http://localhost:3001/billing?success=true`,
-    cancel_url: `http://localhost:3001/billing?cancelled=true`,
+    success_url: `${process.env.DASHBOARD_URL ?? "http://localhost:3001"}/billing?success=true`,
+    cancel_url: `${process.env.DASHBOARD_URL ?? "http://localhost:3001"}/billing?cancelled=true`,
     metadata,
   });
   return { url: session.url!, sessionId: session.id };
@@ -30,7 +42,7 @@ export async function createCheckoutSession(
 
 export async function createCustomer(
   email: string,
-  name: string
+  name: string,
 ): Promise<string> {
   const stripe = getStripe();
   const customer = await stripe.customers.create({ email, name });
@@ -38,14 +50,14 @@ export async function createCustomer(
 }
 
 export async function getSubscription(
-  subscriptionId: string
+  subscriptionId: string,
 ): Promise<Stripe.Subscription> {
   const stripe = getStripe();
   return stripe.subscriptions.retrieve(subscriptionId);
 }
 
 export async function cancelSubscription(
-  subscriptionId: string
+  subscriptionId: string,
 ): Promise<void> {
   const stripe = getStripe();
   await stripe.subscriptions.cancel(subscriptionId);
@@ -78,12 +90,12 @@ export async function deleteStripeCoupon(couponId: string): Promise<void> {
 
 export function constructWebhookEvent(
   body: string,
-  signature: string
+  signature: string,
 ): Stripe.Event {
   const stripe = getStripe();
   return stripe.webhooks.constructEvent(
     body,
     signature,
-    env.STRIPE_WEBHOOK_SECRET!
+    env.STRIPE_WEBHOOK_SECRET!,
   );
 }

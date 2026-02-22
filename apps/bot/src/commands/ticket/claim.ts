@@ -3,7 +3,7 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { type Database } from "@digi/db";
-import { claimTicket } from "../../handlers/ticket-claim.js";
+import { claimTicket } from "../../handlers/ticket-claim";
 
 export const ticketClaimCommand = new SlashCommandBuilder()
   .setName("ticket-claim")
@@ -11,7 +11,7 @@ export const ticketClaimCommand = new SlashCommandBuilder()
 
 export async function handleTicketClaim(
   interaction: ChatInputCommandInteraction,
-  db: Database
+  db: Database,
 ) {
   await interaction.deferReply({ ephemeral: true });
 
@@ -20,7 +20,7 @@ export async function handleTicketClaim(
     interaction.user.id,
     interaction.user.username,
     db,
-    interaction.client
+    interaction.client,
   );
 
   if (!result.success) {

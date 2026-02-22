@@ -1,5 +1,13 @@
-import { query, mutate } from "../lib/api.js";
-import { colors, success, error, log, newline, table, spinner } from "../lib/output.js";
+import { query, mutate } from "../lib/api";
+import {
+  colors,
+  success,
+  error,
+  log,
+  newline,
+  table,
+  spinner,
+} from "../lib/output";
 
 interface Domain {
   id: string;
@@ -34,7 +42,9 @@ async function listDomains(): Promise<void> {
 
     if (data.domains.length === 0) {
       log("\nNo custom domains configured.");
-      log(`Use ${colors.bold("digi domains add <serviceId> <domain>")} to add one.`);
+      log(
+        `Use ${colors.bold("digi domains add <serviceId> <domain>")} to add one.`,
+      );
       return;
     }
 
@@ -51,7 +61,9 @@ async function listDomains(): Promise<void> {
     newline();
   } catch (err) {
     spin.stop();
-    error(`Failed to list domains: ${err instanceof Error ? err.message : String(err)}`);
+    error(
+      `Failed to list domains: ${err instanceof Error ? err.message : String(err)}`,
+    );
     process.exit(1);
   }
 }
@@ -82,7 +94,9 @@ async function addDomain(serviceId: string, domain: string): Promise<void> {
     }
   } catch (err) {
     spin.stop();
-    error(`Failed to add domain: ${err instanceof Error ? err.message : String(err)}`);
+    error(
+      `Failed to add domain: ${err instanceof Error ? err.message : String(err)}`,
+    );
     process.exit(1);
   }
 }

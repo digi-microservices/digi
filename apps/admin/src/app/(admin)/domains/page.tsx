@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { graphqlClient } from "~/lib/graphql";
 import { DataTable } from "~/components/data-table";
 import { Modal } from "~/components/modal";
+import { Input } from "@digi/ui";
 
 interface Domain {
   id: string;
@@ -25,7 +26,7 @@ export default function DomainsPage() {
     const res = await graphqlClient<{ domains: Domain[] }>(`
       query { domains { id domain isDefault serviceCount createdAt } }
     `);
-    if (res.data) setDomains(res.data.domains);
+    if (res.domains) setDomains(res.domains);
   }
 
   useEffect(() => {
@@ -94,8 +95,8 @@ export default function DomainsPage() {
       {showAdd && (
         <Modal title="Add Platform Domain" onClose={() => setShowAdd(false)}>
           <div className="space-y-3">
-            <input placeholder="domain.tld" value={newDomain} onChange={(e) => setNewDomain(e.target.value)} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
-            <input placeholder="Cloudflare Zone ID" value={zoneId} onChange={(e) => setZoneId(e.target.value)} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
+            <Input placeholder="domain.tld" value={newDomain} onChange={(e) => setNewDomain(e.target.value)} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
+            <Input placeholder="Cloudflare Zone ID" value={zoneId} onChange={(e) => setZoneId(e.target.value)} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
             <button onClick={handleAdd} disabled={submitting || !newDomain || !zoneId} className="w-full rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50">
               {submitting ? "Adding..." : "Add Domain"}
             </button>

@@ -1,9 +1,24 @@
-import { eq } from "drizzle-orm";
-import { subscriptions } from "@digi/db/schema";
+import { eq, and } from "drizzle-orm";
+import { subscriptions, services } from "@digi/db/schema";
 import { type Database } from "@digi/db";
 import { type Cache } from "@digi/redis/cache";
 import { CacheKeys } from "@digi/redis/cache";
-import { constructWebhookEvent } from "../services/stripe.service.js";
+import { constructWebhookEvent } from "../services/stripe.service";
+
+async function pauseUserServices(db: Database, userId: string) {
+  const runningServices = await db.query.services.findMany({
+    where: and(eq(services.userId, userId), eq(services.status, "running")),
+  });
+
+  for (const svc of runningServices) {
+    await db
+      .update(services)
+      .set({ status: "stopped", updatedAt: new Date() })
+      .where(eq(services.id, svc.id));
+  }
+
+  return runningServices.length;
+}
 
 export function createStripeWebhookHandler(db: Database, cache: Cache) {
   return async (request: Request): Promise<Response> => {
@@ -55,7 +70,9 @@ export function createStripeWebhookHandler(db: Database, cache: Cache) {
               });
             }
 
-            await cache.del(CacheKeys.userSubscription(session.metadata.userId));
+            await cache.del(
+              CacheKeys.userSubscription(session.metadata.userId),
+            );
           }
           break;
         }
@@ -76,12 +93,27 @@ export function createStripeWebhookHandler(db: Database, cache: Cache) {
             await db
               .update(subscriptions)
               .set({
-                status: subscription.status as "active" | "past_due" | "cancelled",
-                currentPeriodStart: new Date(subscription.current_period_start * 1000),
-                currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                status: subscription.status as
+                  | "active"
+                  | "past_due"
+                  | "cancelled",
+                currentPeriodStart: new Date(
+                  subscription.current_period_start * 1000,
+                ),
+                currentPeriodEnd: new Date(
+                  subscription.current_period_end * 1000,
+                ),
                 updatedAt: new Date(),
               })
               .where(eq(subscriptions.id, sub.id));
+
+            // Auto-pause services when subscription becomes past_due or cancelled
+            if (
+              subscription.status === "past_due" ||
+              subscription.status === "cancelled"
+            ) {
+              await pauseUserServices(db, sub.userId);
+            }
 
             await cache.del(CacheKeys.userSubscription(sub.userId));
           }
@@ -100,6 +132,9 @@ export function createStripeWebhookHandler(db: Database, cache: Cache) {
               .update(subscriptions)
               .set({ status: "cancelled", updatedAt: new Date() })
               .where(eq(subscriptions.id, sub.id));
+
+            // Auto-pause all running services
+            await pauseUserServices(db, sub.userId);
 
             await cache.del(CacheKeys.userSubscription(sub.userId));
           }

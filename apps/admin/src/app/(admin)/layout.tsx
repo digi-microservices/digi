@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { env } from "~/env";
 import AdminShell from "~/components/admin-shell";
+import { AppFooter } from "@digi/ui";
 
 export default async function AdminLayout({
   children,
@@ -33,11 +34,15 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950">
+    
+    <div className="flex min-h-screen flex-col">
       <AdminShell user={sessionUser}>
-        <main className="pl-56 pt-14">
+        <main className="flex-1 pl-56 pt-14">
           <div className="p-10">{children}</div>
         </main>
+        <div className="pl-56">
+          <AppFooter />
+        </div>
       </AdminShell>
     </div>
   );

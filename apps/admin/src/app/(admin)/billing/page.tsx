@@ -29,7 +29,7 @@ export default function BillingPage() {
       }
     `)
       .then((res) => {
-        if (res.data) setStats(res.data.billingStats);
+        if (res.billingStats) setStats(res.billingStats);
       })
       .catch(console.error)
       .finally(() => setLoading(false));

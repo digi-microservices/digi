@@ -9,7 +9,11 @@ export const env = createEnv({
   },
 
   client: {
-    NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:4000"),
+    NEXT_PUBLIC_API_URL: z.string().url().default("http://api.localhost"),
+    NEXT_PUBLIC_SUPPORT_URL: z
+      .string()
+      .url()
+      .default("http://support.localhost"),
   },
 
   runtimeEnv: {
@@ -17,6 +21,7 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_SUPPORT_URL: process.env.NEXT_PUBLIC_SUPPORT_URL,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

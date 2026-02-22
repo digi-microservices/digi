@@ -21,6 +21,7 @@ const envSchema = z.object({
   PLATFORM_DOMAIN: z.string().default("localhost"),
   MASTER_CADDY_URL: z.string().optional(),
   ALLOWED_ORIGINS: z.string().optional(),
+  TS_AUTH_KEY: z.string().optional(),
   PORT: z
     .string()
     .transform(Number)

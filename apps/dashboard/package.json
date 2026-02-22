@@ -16,6 +16,7 @@
     "@digi/shared": "workspace:*",
     "@digi/ui": "workspace:*",
     "@t3-oss/env-nextjs": "^0.12.0",
+    "motion": "^12.34.2",
     "next": "^15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

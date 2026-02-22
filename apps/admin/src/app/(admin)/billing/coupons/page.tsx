@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { graphqlClient } from "~/lib/graphql";
 import { DataTable } from "~/components/data-table";
 import { Modal } from "~/components/modal";
+import { Input } from "@digi/ui";
 
 interface Coupon {
   id: string;
@@ -27,7 +28,7 @@ export default function CouponsPage() {
     const res = await graphqlClient<{ coupons: Coupon[] }>(`
       query { coupons { id code type amount maxRedemptions timesRedeemed isActive expiresAt } }
     `);
-    if (res.data) setCoupons(res.data.coupons);
+    if (res.coupons) setCoupons(res.coupons);
   }
 
   useEffect(() => {
@@ -105,14 +106,14 @@ export default function CouponsPage() {
       {showCreate && (
         <Modal title="Create Coupon" onClose={() => setShowCreate(false)}>
           <div className="space-y-3">
-            <input placeholder="Code (e.g. LAUNCH20)" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
+            <Input placeholder="Code (e.g. LAUNCH20)" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
             <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white">
               <option value="percentage">Percentage</option>
               <option value="fixed">Fixed Amount</option>
             </select>
-            <input placeholder={form.type === "percentage" ? "Amount (%)" : "Amount (pence)"} value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
-            <input placeholder="Max redemptions (optional)" value={form.maxRedemptions} onChange={(e) => setForm({ ...form, maxRedemptions: e.target.value })} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
-            <input type="date" placeholder="Expires (optional)" value={form.expiresAt} onChange={(e) => setForm({ ...form, expiresAt: e.target.value })} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
+            <Input placeholder={form.type === "percentage" ? "Amount (%)" : "Amount (pence)"} value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
+            <Input placeholder="Max redemptions (optional)" value={form.maxRedemptions} onChange={(e) => setForm({ ...form, maxRedemptions: e.target.value })} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
+            <Input type="date" placeholder="Expires (optional)" value={form.expiresAt} onChange={(e) => setForm({ ...form, expiresAt: e.target.value })} className="w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-white" />
             <button onClick={handleCreate} disabled={submitting || !form.code || !form.amount} className="w-full rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50">
               {submitting ? "Creating..." : "Create Coupon"}
             </button>

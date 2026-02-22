@@ -1,8 +1,8 @@
 import { Client, GatewayIntentBits, Partials } from "discord.js";
 import { createDb } from "@digi/db";
 import { createRedisClient } from "@digi/redis";
-import { env } from "./env.js";
-import { registerEvents } from "./events/index.js";
+import { env } from "./env";
+import { registerEvents } from "./events/index";
 
 const client = new Client({
   intents: [

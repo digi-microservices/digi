@@ -7,7 +7,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-950 px-4 py-8">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-charcoal px-4 py-8">
       {/* Noise overlay */}
       <div className="digi-noise" />
 

@@ -4,6 +4,8 @@ const baseTypeDefs = /* GraphQL */ `
 
   type Query {
     me: User
+    vms: [VM!]!
+    adminOverview: AdminOverview!
     services(userId: String): [Service!]!
     service(id: String!): Service
     servers: [ProxmoxNode!]!
@@ -13,6 +15,7 @@ const baseTypeDefs = /* GraphQL */ `
     users(limit: Int, offset: Int): [User!]!
     coupons: [Coupon!]!
     apiTokens: [ApiToken!]!
+    plans: [Plan!]!
   }
 
   type Mutation {
@@ -26,12 +29,16 @@ const baseTypeDefs = /* GraphQL */ `
 
     addProxmoxNode(input: AddProxmoxNodeInput!): ProxmoxNode!
     removeProxmoxNode(id: String!): Boolean!
+    provisionVm(serverId: String!, vmName: String!): VM!
 
     addDomain(input: AddDomainInput!): PlatformDomain!
     removeDomain(id: String!): Boolean!
     setDomainDefault(id: String!): PlatformDomain!
 
     createCheckoutSession(planId: String!): CheckoutSessionResult!
+    createCustomerPortalSession: CustomerPortalResult!
+    cancelSubscription: Boolean!
+    downgradeToFree(serviceId: String!): Service!
     upgradeStorage(additionalGb: Int!): Boolean!
     createCoupon(input: CreateCouponInput!): Coupon!
     deactivateCoupon(id: String!): Coupon!
@@ -61,7 +68,8 @@ const baseTypeDefs = /* GraphQL */ `
     suspended: Boolean!
     createdAt: DateTime!
     updatedAt: DateTime!
-    services: [Service!]!
+    serviceCount: Int!
+    services: [Service!]
     subscription: Subscription_
   }
 
@@ -73,6 +81,15 @@ const baseTypeDefs = /* GraphQL */ `
     stripeCustomerId: String
     extraStorageGb: Int!
     currentPeriodEnd: DateTime
+  }
+
+  type AdminOverview {
+    totalUsers: Int!
+    totalServices: Int!
+    totalServers: Int!
+    totalVms: Int!
+    activeServices: Int!
+    mrr: Int!
   }
 
   type Service {
@@ -231,6 +248,10 @@ const baseTypeDefs = /* GraphQL */ `
     sessionId: String!
   }
 
+  type CustomerPortalResult {
+    url: String!
+  }
+
   type ApiToken {
     id: String!
     name: String!
@@ -261,6 +282,7 @@ const baseTypeDefs = /* GraphQL */ `
     type: String!
     name: String!
     dockerImage: String
+    internalPort: Int
     envVars: JSON
     resourceLimits: JSON
   }

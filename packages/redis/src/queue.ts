@@ -1,5 +1,5 @@
-import { type RedisClient } from "./client.js";
-import { type PubSub, Channels } from "./pubsub.js";
+import { type RedisClient } from "./client";
+import { type PubSub, Channels } from "./pubsub";
 import { generateId } from "@digi/shared/utils";
 
 export interface JobData {
@@ -17,7 +17,7 @@ export interface JobQueue {
   enqueue(
     type: string,
     payload: Record<string, unknown>,
-    db: EnqueueDb
+    db: EnqueueDb,
   ): Promise<string>;
   process(handlers: Record<string, JobHandler>, db: ProcessDb): void;
   stop(): void;
@@ -40,10 +40,7 @@ export interface ProcessDb {
   retryJob(id: string, error: string): Promise<void>;
 }
 
-export function createJobQueue(
-  redis: RedisClient,
-  pubsub: PubSub
-): JobQueue {
+export function createJobQueue(redis: RedisClient, pubsub: PubSub): JobQueue {
   let running = false;
   let pollInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -51,7 +48,7 @@ export function createJobQueue(
     async enqueue(
       type: string,
       payload: Record<string, unknown>,
-      db: EnqueueDb
+      db: EnqueueDb,
     ): Promise<string> {
       const id = generateId("job");
       await db.insertJob({ id, type, payload });

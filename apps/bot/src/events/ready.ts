@@ -2,16 +2,16 @@ import { type Client } from "discord.js";
 import { eq } from "drizzle-orm";
 import { type Database, tickets } from "@digi/db";
 import { type RedisClient } from "@digi/redis";
-import { openTicketChannels } from "../handlers/ticket-open.js";
-import { startInactivityCheck } from "../schedulers/inactivity-check.js";
-import { startAutoDelete } from "../schedulers/auto-delete.js";
-import { env } from "../env.js";
+import { openTicketChannels } from "../handlers/ticket-open";
+import { startInactivityCheck } from "../schedulers/inactivity-check";
+import { startAutoDelete } from "../schedulers/auto-delete";
+import { env } from "../env";
 
 export function registerReadyEvent(
   client: Client,
-  { db }: { db: Database; redis: RedisClient }
+  { db }: { db: Database; redis: RedisClient },
 ) {
-  client.once("ready", async (c) => {
+  client.once("clientReady", async (c) => {
     console.log(`Logged in as ${c.user.tag}`);
 
     // Seed in-memory open ticket channel cache

@@ -1,5 +1,13 @@
-import { requireConfig } from "../lib/config.js";
-import { colors, success, error, info, log, newline, spinner } from "../lib/output.js";
+import { requireConfig } from "../lib/config";
+import {
+  colors,
+  success,
+  error,
+  info,
+  log,
+  newline,
+  spinner,
+} from "../lib/output";
 
 interface HealthResponse {
   status: string;
@@ -47,12 +55,14 @@ export async function statusCommand(_args: string[]): Promise<void> {
     success("Platform is operational.");
   } catch (err) {
     spin.stop(undefined);
-    error(
-      `Cannot reach platform at ${colors.bold(healthUrl)}`,
-    );
+    error(`Cannot reach platform at ${colors.bold(healthUrl)}`);
     log(`  ${colors.dim(err instanceof Error ? err.message : String(err))}`);
     newline();
-    info("Is the API server running? Check your API URL with " + colors.bold("digi login") + ".");
+    info(
+      "Is the API server running? Check your API URL with " +
+        colors.bold("digi login") +
+        ".",
+    );
     process.exit(1);
   }
 }

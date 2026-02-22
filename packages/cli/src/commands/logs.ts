@@ -1,12 +1,14 @@
-import { requireConfig } from "../lib/config.js";
-import { colors, error, info, log } from "../lib/output.js";
+import { requireConfig } from "../lib/config";
+import { colors, error, info, log } from "../lib/output";
 
 export async function logsCommand(args: string[]): Promise<void> {
   const serviceId = args[0];
   const containerName = args[1] ?? null;
 
   if (!serviceId) {
-    error("Service ID is required. Usage: digi logs <serviceId> [containerName]");
+    error(
+      "Service ID is required. Usage: digi logs <serviceId> [containerName]",
+    );
     process.exit(1);
   }
 
@@ -79,9 +81,13 @@ export async function logsCommand(args: string[]): Promise<void> {
 
         if (msg.type === "next" && msg.payload?.data?.containerLogs) {
           const logEntry = msg.payload.data.containerLogs;
-          const ts = colors.dim(new Date(logEntry.timestamp).toISOString().slice(11, 23));
+          const ts = colors.dim(
+            new Date(logEntry.timestamp).toISOString().slice(11, 23),
+          );
           const stream =
-            logEntry.stream === "stderr" ? colors.red("[err]") : colors.dim("[out]");
+            logEntry.stream === "stderr"
+              ? colors.red("[err]")
+              : colors.dim("[out]");
           const cid = colors.gray(logEntry.containerId.slice(0, 8));
           process.stdout.write(`${ts} ${cid} ${stream} ${logEntry.message}\n`);
         }
@@ -120,7 +126,9 @@ export async function logsCommand(args: string[]): Promise<void> {
       // This promise never resolves; the process exits via ws.close or SIGINT
     });
   } catch (err) {
-    error(`Failed to connect to log stream: ${err instanceof Error ? err.message : String(err)}`);
+    error(
+      `Failed to connect to log stream: ${err instanceof Error ? err.message : String(err)}`,
+    );
     process.exit(1);
   }
 }

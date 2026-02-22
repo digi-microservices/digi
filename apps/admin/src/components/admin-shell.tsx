@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Navbar } from "@digi/ui";
 import AdminSidebar from "~/components/admin-sidebar";
 import { authClient } from "~/lib/auth-client";
+import "~/styles/globals.css";
 
 interface AdminShellProps {
   user: { email?: string; name?: string };
@@ -24,13 +25,15 @@ export default function AdminShell({ user, children }: AdminShellProps) {
 
   return (
     <>
-      <Navbar
-        appLabel="Admin"
-        user={user}
-        onSignOut={handleSignOut}
-        settingsHref="/password"
-        billingHref="/billing"
-      />
+      <div className="flex h-14 w-screen">
+        <Navbar
+          appLabel="Admin"
+          user={user}
+          onSignOut={handleSignOut}
+          settingsHref="/password"
+          billingHref="/billing"
+        />
+      </div>
       <AdminSidebar />
       {children}
     </>

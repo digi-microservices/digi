@@ -1,4 +1,4 @@
-import { type RedisClient } from "./client.js";
+import { type RedisClient } from "./client";
 
 export interface Cache {
   get<T>(key: string): Promise<T | null>;

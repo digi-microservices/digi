@@ -6,17 +6,17 @@ import Link from "next/link";
 import { gql } from "~/lib/graphql";
 import { EnvEditor, type EnvVar } from "~/components/env-editor";
 
-interface ServiceSettings {
+interface ServiceData {
   id: string;
   name: string;
-  domain: string;
-  envVars: EnvVar[];
+  publicUrl: string;
+  envVars: Record<string, string> | null;
 }
 
 export default function ServiceSettingsPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const [settings, setSettings] = useState<ServiceSettings | null>(null);
+  const [service, setService] = useState<ServiceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [envVars, setEnvVars] = useState<EnvVar[]>([]);
@@ -26,22 +26,20 @@ export default function ServiceSettingsPage() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    gql<{ serviceSettings: ServiceSettings }>(`
-      query ServiceSettings($id: ID!) {
-        serviceSettings(id: $id) {
-          id
-          name
-          domain
-          envVars {
-            key
-            value
-          }
+    gql<{ service: ServiceData }>(`
+      query ServiceSettings($id: String!) {
+        service(id: $id) {
+          id name publicUrl envVars
         }
       }
     `, { id: params.id })
       .then((data) => {
-        setSettings(data.serviceSettings);
-        setEnvVars(data.serviceSettings.envVars);
+        setService(data.service);
+        // Convert envVars object to array for EnvEditor
+        const vars: EnvVar[] = data.service.envVars
+          ? Object.entries(data.service.envVars).map(([key, value]) => ({ key, value }))
+          : [];
+        setEnvVars(vars);
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
@@ -52,15 +50,19 @@ export default function ServiceSettingsPage() {
     setError(null);
 
     try {
+      // Convert array to object for the API
+      const varsObj: Record<string, string> = {};
+      for (const v of envVars) {
+        if (v.key.trim()) varsObj[v.key] = v.value;
+      }
+
       await gql(`
-        mutation UpdateEnvVars($id: ID!, $envVars: [EnvVarInput!]!) {
-          updateEnvVars(serviceId: $id, envVars: $envVars) {
-            id
-          }
+        mutation SetEnvVars($serviceId: String!, $vars: JSON!) {
+          setEnvVars(serviceId: $serviceId, vars: $vars)
         }
       `, {
-        id: params.id,
-        envVars: envVars.filter((v) => v.key.trim() !== ""),
+        serviceId: params.id,
+        vars: varsObj,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -75,7 +77,7 @@ export default function ServiceSettingsPage() {
     setDeleting(true);
     try {
       await gql(`
-        mutation DeleteService($id: ID!) {
+        mutation DeleteService($id: String!) {
           deleteService(id: $id)
         }
       `, { id: params.id });
@@ -115,10 +117,10 @@ export default function ServiceSettingsPage() {
       )}
 
       {/* Domain */}
-      {settings && (
+      {service && (
         <section className="mb-8 rounded-xl border border-neutral-800 bg-neutral-900 p-6">
           <h2 className="mb-4 text-lg font-semibold text-white">Domain</h2>
-          <p className="text-sm text-neutral-300 font-mono">{settings.domain}</p>
+          <p className="text-sm text-neutral-300 font-mono">{service.publicUrl}</p>
         </section>
       )}
 
@@ -157,7 +159,7 @@ export default function ServiceSettingsPage() {
           <div className="w-full max-w-md rounded-xl border border-neutral-800 bg-neutral-900 p-6">
             <h3 className="mb-2 text-lg font-semibold text-white">Delete service?</h3>
             <p className="mb-6 text-sm text-neutral-400">
-              This will permanently delete <strong className="text-white">{settings?.name}</strong>{" "}
+              This will permanently delete <strong className="text-white">{service?.name}</strong>{" "}
               and all associated containers, databases, and data.
             </p>
             <div className="flex justify-end gap-3">

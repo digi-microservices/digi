@@ -1,24 +1,20 @@
-import {
-  type Client,
-  type Interaction,
-  InteractionType,
-} from "discord.js";
+import { type Client, type Interaction, InteractionType } from "discord.js";
 import { type Database } from "@digi/db";
-import { env } from "../env.js";
-import { openTicket } from "../handlers/ticket-open.js";
-import { closeTicket } from "../handlers/ticket-close.js";
-import { claimTicket } from "../handlers/ticket-claim.js";
-import { handleSetupBuildServer } from "../commands/setup/build-server.js";
-import { handleSetupTicketPanel } from "../commands/setup/ticket-panel.js";
-import { handleSetupHelperRole } from "../commands/setup/helper-role.js";
-import { handleTicketClose } from "../commands/ticket/close.js";
-import { handleTicketClaim } from "../commands/ticket/claim.js";
-import { handleTicketUnclaim } from "../commands/ticket/unclaim.js";
-import { handleTicketTag } from "../commands/ticket/tag.js";
+import { env } from "../env";
+import { openTicket } from "../handlers/ticket-open";
+import { closeTicket } from "../handlers/ticket-close";
+import { claimTicket } from "../handlers/ticket-claim";
+import { handleSetupBuildServer } from "../commands/setup/build-server";
+import { handleSetupTicketPanel } from "../commands/setup/ticket-panel";
+import { handleSetupHelperRole } from "../commands/setup/helper-role";
+import { handleTicketClose } from "../commands/ticket/close";
+import { handleTicketClaim } from "../commands/ticket/claim";
+import { handleTicketUnclaim } from "../commands/ticket/unclaim";
+import { handleTicketTag } from "../commands/ticket/tag";
 
 export function registerInteractionCreateEvent(
   client: Client,
-  { db }: { db: Database }
+  { db }: { db: Database },
 ) {
   client.on("interactionCreate", async (interaction: Interaction) => {
     try {
@@ -39,7 +35,7 @@ export function registerInteractionCreateEvent(
             interaction.user.id,
             db,
             client,
-            env.BOT_DASHBOARD_URL
+            env.BOT_DASHBOARD_URL,
           );
           if (result.success) {
             await interaction.reply({
@@ -61,7 +57,7 @@ export function registerInteractionCreateEvent(
             interaction.user.id,
             interaction.user.username,
             db,
-            client
+            client,
           );
           if (result.success) {
             await interaction.reply({

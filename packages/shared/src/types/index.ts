@@ -1,3 +1,3 @@
-export * from "./service.js";
-export * from "./server.js";
-export * from "./billing.js";
+export * from "./service";
+export * from "./server";
+export * from "./billing";

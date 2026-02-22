@@ -1,4 +1,4 @@
-import { type CliConfig, requireConfig } from "./config.js";
+import { type CliConfig, requireConfig } from "./config";
 
 interface GraphQLResponse<T = unknown> {
   data?: T;
@@ -28,7 +28,9 @@ export async function query<T = unknown>(
   });
 
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `API request failed: ${response.status} ${response.statusText}`,
+    );
   }
 
   const json = (await response.json()) as GraphQLResponse<T>;

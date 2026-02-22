@@ -1,5 +1,5 @@
-import { type DigiClient } from "./client.js";
-import { type EnvVar } from "./types.js";
+import { type DigiClient } from "./client";
+import { type EnvVar } from "./types";
 
 export class EnvAPI {
   constructor(private readonly client: DigiClient) {}

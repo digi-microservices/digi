@@ -1,4 +1,4 @@
-export { createRedisClient, type RedisClient } from "./client.js";
-export { createCache, type Cache } from "./cache.js";
-export { createPubSub, type PubSub } from "./pubsub.js";
-export { createJobQueue, type JobQueue } from "./queue.js";
+export { createRedisClient, type RedisClient } from "./client";
+export { createCache, type Cache } from "./cache";
+export { createPubSub, type PubSub } from "./pubsub";
+export { createJobQueue, type JobQueue } from "./queue";

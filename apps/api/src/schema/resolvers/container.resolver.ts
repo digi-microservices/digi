@@ -1,13 +1,13 @@
 import { eq, and } from "drizzle-orm";
 import { containers, services } from "@digi/db/schema";
-import { type Context } from "../../context.js";
+import { type Context } from "../../context";
 
 export const containerResolvers = {
   Mutation: {
     stopContainer: async (
       _: unknown,
       args: { serviceId: string; containerId: string },
-      ctx: Context
+      ctx: Context,
     ) => {
       if (!ctx.user) throw new Error("Unauthorized");
 
@@ -26,8 +26,8 @@ export const containerResolvers = {
         .where(
           and(
             eq(containers.id, args.containerId),
-            eq(containers.serviceId, args.serviceId)
-          )
+            eq(containers.serviceId, args.serviceId),
+          ),
         );
 
       return ctx.db.query.containers.findFirst({
@@ -38,7 +38,7 @@ export const containerResolvers = {
     restartContainer: async (
       _: unknown,
       args: { serviceId: string; containerId: string },
-      ctx: Context
+      ctx: Context,
     ) => {
       if (!ctx.user) throw new Error("Unauthorized");
 
@@ -57,8 +57,8 @@ export const containerResolvers = {
         .where(
           and(
             eq(containers.id, args.containerId),
-            eq(containers.serviceId, args.serviceId)
-          )
+            eq(containers.serviceId, args.serviceId),
+          ),
         );
 
       return ctx.db.query.containers.findFirst({

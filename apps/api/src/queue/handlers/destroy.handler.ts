@@ -3,14 +3,14 @@ import { services, containers, dnsRecords } from "@digi/db/schema";
 import { type Database } from "@digi/db";
 import { type Cache } from "@digi/redis/cache";
 import { CacheKeys } from "@digi/redis/cache";
-import * as docker from "../../services/docker.service.js";
-import * as caddy from "../../services/caddy.service.js";
-import * as cloudflare from "../../services/cloudflare.service.js";
+import * as docker from "../../services/docker.service";
+import * as caddy from "../../services/caddy.service";
+import * as cloudflare from "../../services/cloudflare.service";
 
 export async function executeDestroy(
   db: Database,
   cache: Cache,
-  payload: Record<string, unknown>
+  payload: Record<string, unknown>,
 ): Promise<void> {
   const serviceId = payload.serviceId as string;
 
@@ -72,7 +72,7 @@ export async function executeDestroy(
         try {
           await cloudflare.deleteDnsRecord(
             service.platformDomain.cloudflareZoneId,
-            record.cloudflareRecordId
+            record.cloudflareRecordId,
           );
         } catch {
           // Record may already be deleted

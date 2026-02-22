@@ -3,7 +3,7 @@ import {
   type ChatInputCommandInteraction,
 } from "discord.js";
 import { type Database } from "@digi/db";
-import { closeTicket } from "../../handlers/ticket-close.js";
+import { closeTicket } from "../../handlers/ticket-close";
 
 export const ticketCloseCommand = new SlashCommandBuilder()
   .setName("ticket-close")
@@ -12,13 +12,13 @@ export const ticketCloseCommand = new SlashCommandBuilder()
     opt
       .setName("reason")
       .setDescription("Reason for closing (optional)")
-      .setRequired(false)
+      .setRequired(false),
   );
 
 export async function handleTicketClose(
   interaction: ChatInputCommandInteraction,
   db: Database,
-  dashboardUrl: string
+  dashboardUrl: string,
 ) {
   await interaction.deferReply({ ephemeral: true });
 
@@ -30,7 +30,7 @@ export async function handleTicketClose(
     db,
     interaction.client,
     dashboardUrl,
-    reason
+    reason,
   );
 
   if (!result.success) {

@@ -1,8 +1,8 @@
 import { randomBytes } from "crypto";
-import { saveConfig } from "../lib/config.js";
-import { query } from "../lib/api.js";
-import { colors, success, error, info, log, newline } from "../lib/output.js";
-import { prompt, select } from "../lib/prompt.js";
+import { saveConfig } from "../lib/config";
+import { query } from "../lib/api";
+import { colors, success, error, info, log, newline } from "../lib/output";
+import { prompt, select } from "../lib/prompt";
 
 interface MeResponse {
   me: {
@@ -39,10 +39,13 @@ async function browserLogin(apiUrl: string): Promise<void> {
 
   // Start temporary HTTP server to receive the callback
   const token = await new Promise<string>((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      server.stop();
-      reject(new Error("Login timed out after 5 minutes."));
-    }, 5 * 60 * 1000);
+    const timeout = setTimeout(
+      () => {
+        server.stop();
+        reject(new Error("Login timed out after 5 minutes."));
+      },
+      5 * 60 * 1000,
+    );
 
     const server = Bun.serve({
       port,
@@ -129,7 +132,9 @@ export async function loginCommand(_args: string[]): Promise<void> {
 
   try {
     if (method.startsWith("Browser")) {
-      const apiUrl = await prompt("API URL", { default: "http://localhost:4000" });
+      const apiUrl = await prompt("API URL", {
+        default: "http://localhost:4000",
+      });
       await browserLogin(apiUrl);
     } else {
       await tokenLogin();

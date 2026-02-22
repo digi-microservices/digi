@@ -1,5 +1,5 @@
-import { removeConfig } from "../lib/config.js";
-import { success, info } from "../lib/output.js";
+import { removeConfig } from "../lib/config";
+import { success, info } from "../lib/output";
 
 export async function logoutCommand(_args: string[]): Promise<void> {
   const removed = removeConfig();

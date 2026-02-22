@@ -1,12 +1,12 @@
 import { GraphQLScalarType, Kind } from "graphql";
-import { userResolvers } from "./user.resolver.js";
-import { serviceResolvers } from "./service.resolver.js";
-import { containerResolvers } from "./container.resolver.js";
-import { serverResolvers } from "./server.resolver.js";
-import { domainResolvers } from "./domain.resolver.js";
-import { billingResolvers } from "./billing.resolver.js";
-import { couponResolvers } from "./coupon.resolver.js";
-import { adminResolvers } from "./admin.resolver.js";
+import { userResolvers } from "./user.resolver";
+import { serviceResolvers } from "./service.resolver";
+import { containerResolvers } from "./container.resolver";
+import { serverResolvers } from "./server.resolver";
+import { domainResolvers } from "./domain.resolver";
+import { billingResolvers } from "./billing.resolver";
+import { couponResolvers } from "./coupon.resolver";
+import { adminResolvers } from "./admin.resolver";
 
 const DateTimeScalar = new GraphQLScalarType({
   name: "DateTime",
@@ -49,6 +49,7 @@ export const resolvers = {
     ...serviceResolvers.Query,
     ...serverResolvers.Query,
     ...domainResolvers.Query,
+    ...billingResolvers.Query,
     ...adminResolvers.Query,
   },
   Mutation: {

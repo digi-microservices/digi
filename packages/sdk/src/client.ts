@@ -1,8 +1,8 @@
-import { type DigiClientConfig } from "./types.js";
-import { ServicesAPI } from "./services.js";
-import { DeploymentsAPI } from "./deployments.js";
-import { DomainsAPI } from "./domains.js";
-import { EnvAPI } from "./env.js"
+import { type DigiClientConfig } from "./types";
+import { ServicesAPI } from "./services";
+import { DeploymentsAPI } from "./deployments";
+import { DomainsAPI } from "./domains";
+import { EnvAPI } from "./env";
 
 export class DigiSDKError extends Error {
   constructor(
@@ -53,10 +53,7 @@ export class DigiClient {
 
     if (json.errors && json.errors.length > 0) {
       const err = json.errors[0]!;
-      throw new DigiSDKError(
-        err.message,
-        err.extensions?.code,
-      );
+      throw new DigiSDKError(err.message, err.extensions?.code);
     }
 
     return json.data as T;

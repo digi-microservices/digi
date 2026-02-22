@@ -1,7 +1,7 @@
 import { existsSync, writeFileSync } from "fs";
 import { join } from "path";
-import { colors, success, error, info, log, newline } from "../lib/output.js";
-import { confirm } from "../lib/prompt.js";
+import { colors, success, error, info, log, newline } from "../lib/output";
+import { confirm } from "../lib/prompt";
 
 const TEMPLATE = `# digi.toml — Digi PaaS deployment config
 # Docs: https://digi.run/docs/cli
@@ -36,9 +36,7 @@ export async function initCommand(args: string[]): Promise<void> {
     }
   }
 
-  const content = name
-    ? TEMPLATE.replace("[app]", `[${name}]`)
-    : TEMPLATE;
+  const content = name ? TEMPLATE.replace("[app]", `[${name}]`) : TEMPLATE;
 
   writeFileSync(tomlPath, content);
 

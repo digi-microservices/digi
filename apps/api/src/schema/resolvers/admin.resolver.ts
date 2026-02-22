@@ -1,7 +1,7 @@
 import { eq, desc } from "drizzle-orm";
-import { users, auditLogs } from "@digi/db/schema";
+import { users, auditLogs, services } from "@digi/db/schema";
 import { generateId } from "@digi/shared/utils";
-import { type Context } from "../../context.js";
+import { type Context } from "../../context";
 
 function requireAdmin(ctx: Context) {
   if (!ctx.user) throw new Error("Unauthorized");
@@ -13,20 +13,33 @@ export const adminResolvers = {
     users: async (
       _: unknown,
       args: { limit?: number; offset?: number },
-      ctx: Context
+      ctx: Context,
     ) => {
       requireAdmin(ctx);
-      return ctx.db.query.users.findMany({
+      const rawUsers = await ctx.db.query.users.findMany({
         limit: args.limit ?? 50,
         offset: args.offset ?? 0,
         orderBy: desc(users.createdAt),
       });
+
+      const formattedUsers = rawUsers.map(async (u) => {
+        const userServices = await ctx.db.query.services.findMany({
+          where: eq(services.userId, u.id),
+        });
+        return {
+          ...u,
+          services: userServices,
+          serviceCount: userServices.length,
+        };
+      });
+
+      return formattedUsers;
     },
 
     auditLogs: async (
       _: unknown,
       args: { limit?: number; offset?: number },
-      ctx: Context
+      ctx: Context,
     ) => {
       requireAdmin(ctx);
       return ctx.db.query.auditLogs.findMany({
@@ -35,14 +48,31 @@ export const adminResolvers = {
         orderBy: desc(auditLogs.createdAt),
       });
     },
+
+    adminOverview: async (_: unknown, __: unknown, ctx: Context) => {
+      requireAdmin(ctx);
+
+      const userCount = await ctx.db.query.users.findMany();
+      const serviceCount = await ctx.db.query.services.findMany();
+      const serverCount = await ctx.db.query.servers.findMany();
+      const vmCount = await ctx.db.query.vms.findMany();
+      const activeServices = await ctx.db.query.services.findMany({
+        where: eq(services.status, "running"),
+      });
+
+      return {
+        totalUsers: userCount.length,
+        totalServices: serviceCount.length,
+        totalServers: serverCount.length,
+        totalVms: vmCount.length,
+        activeServices: activeServices.length,
+        mrr: 0,
+      };
+    },
   },
 
   Mutation: {
-    suspendUser: async (
-      _: unknown,
-      args: { id: string },
-      ctx: Context
-    ) => {
+    suspendUser: async (_: unknown, args: { id: string }, ctx: Context) => {
       requireAdmin(ctx);
 
       await ctx.db
@@ -64,11 +94,7 @@ export const adminResolvers = {
       });
     },
 
-    unsuspendUser: async (
-      _: unknown,
-      args: { id: string },
-      ctx: Context
-    ) => {
+    unsuspendUser: async (_: unknown, args: { id: string }, ctx: Context) => {
       requireAdmin(ctx);
 
       await ctx.db
@@ -90,11 +116,7 @@ export const adminResolvers = {
       });
     },
 
-    deleteUser: async (
-      _: unknown,
-      args: { id: string },
-      ctx: Context
-    ) => {
+    deleteUser: async (_: unknown, args: { id: string }, ctx: Context) => {
       requireAdmin(ctx);
 
       await ctx.db.delete(users).where(eq(users.id, args.id));

@@ -1,16 +1,16 @@
 #!/usr/bin/env bun
 
-import { loginCommand } from "./commands/login.js";
-import { logoutCommand } from "./commands/logout.js";
-import { whoamiCommand } from "./commands/whoami.js";
-import { servicesCommand } from "./commands/services.js";
-import { deployCommand } from "./commands/deploy.js";
-import { logsCommand } from "./commands/logs.js";
-import { envCommand } from "./commands/env.js";
-import { domainsCommand } from "./commands/domains.js";
-import { statusCommand } from "./commands/status.js";
-import { initCommand } from "./commands/init.js";
-import { colors, error, log, newline } from "./lib/output.js";
+import { loginCommand } from "./commands/login";
+import { logoutCommand } from "./commands/logout";
+import { whoamiCommand } from "./commands/whoami";
+import { servicesCommand } from "./commands/services";
+import { deployCommand } from "./commands/deploy";
+import { logsCommand } from "./commands/logs";
+import { envCommand } from "./commands/env";
+import { domainsCommand } from "./commands/domains";
+import { statusCommand } from "./commands/status";
+import { initCommand } from "./commands/init";
+import { colors, error, log, newline } from "./lib/output";
 
 const VERSION = "0.1.0";
 

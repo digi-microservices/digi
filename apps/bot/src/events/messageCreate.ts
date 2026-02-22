@@ -1,13 +1,18 @@
 import { type Client, type Message } from "discord.js";
 import { eq } from "drizzle-orm";
-import { type Database, tickets, ticketMessages, ticketAttachments } from "@digi/db";
+import {
+  type Database,
+  tickets,
+  ticketMessages,
+  ticketAttachments,
+} from "@digi/db";
 import { type RedisClient } from "@digi/redis";
-import { openTicketChannels } from "../handlers/ticket-open.js";
+import { openTicketChannels } from "../handlers/ticket-open";
 import { generateId } from "@digi/shared/utils";
 
 export function registerMessageCreateEvent(
   client: Client,
-  { db }: { db: Database; redis: RedisClient }
+  { db }: { db: Database; redis: RedisClient },
 ) {
   client.on("messageCreate", async (message: Message) => {
     // Only process messages in known open ticket channels

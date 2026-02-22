@@ -1,6 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_PATHS = ["/login"];
+// middleware.ts
+const PUBLIC_PATHS = ["/login", "/api/auth"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -9,7 +10,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for session cookie (better-auth sets "better-auth.session_token")
+  if (pathname.startsWith("/socket.io")) {
+    return NextResponse.next();
+  }
+
   const sessionCookie =
     request.cookies.get("better-auth.session_token") ??
     request.cookies.get("__Secure-better-auth.session_token");
@@ -24,5 +28,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
+  matcher: ["/((?!socket.io|_next/static|_next/image|favicon.ico).*)"],
 };

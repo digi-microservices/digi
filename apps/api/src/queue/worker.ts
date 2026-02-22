@@ -4,14 +4,14 @@ import { type Database } from "@digi/db";
 import { type RedisClient } from "@digi/redis";
 import { type Cache } from "@digi/redis/cache";
 import { type PubSub, Channels } from "@digi/redis/pubsub";
-import { executeDeploy } from "../services/deployment.service.js";
-import { executeDestroy } from "./handlers/destroy.handler.js";
+import { executeDeploy } from "../services/deployment.service";
+import { executeDestroy } from "./handlers/destroy.handler";
 
 export function startJobWorker(
   db: Database,
   redis: RedisClient,
   pubsub: PubSub,
-  cache: Cache
+  cache: Cache,
 ): void {
   let running = true;
 

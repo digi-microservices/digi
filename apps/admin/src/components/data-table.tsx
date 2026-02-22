@@ -20,11 +20,11 @@ export function DataTable({
   const visible = rows.slice(page * pageSize, (page + 1) * pageSize);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/5 bg-white/[0.02]">
+    <div className="overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.02]">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-white/5">
+            <tr className="border-b border-white/[0.08]">
               {columns.map((col, i) => (
                 <th
                   key={i}

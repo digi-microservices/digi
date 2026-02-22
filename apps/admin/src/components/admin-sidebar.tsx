@@ -3,46 +3,80 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navItems = [
-  { label: "Overview", href: "/", icon: LayoutIcon },
-  { label: "Servers", href: "/servers", icon: ServerIcon },
-  { label: "VMs", href: "/vms", icon: CpuIcon },
-  { label: "Users", href: "/users", icon: UsersIcon },
-  { label: "Domains", href: "/domains", icon: GlobeIcon },
-  { label: "Billing", href: "/billing", icon: CreditCardIcon },
-  { label: "Coupons", href: "/billing/coupons", icon: TagIcon },
-  { label: "Audit Log", href: "/audit", icon: ClipboardIcon },
-  { label: "Platform Logs", href: "/logs", icon: TerminalIcon },
-  { label: "Password", href: "/password", icon: KeyIcon },
+interface NavItem {
+  label: string;
+  href: string;
+  icon: (props: { className?: string }) => React.ReactNode;
+}
+
+const sections: { title: string; items: NavItem[] }[] = [
+  {
+    title: "General",
+    items: [{ label: "Overview", href: "/", icon: LayoutIcon }],
+  },
+  {
+    title: "Infrastructure",
+    items: [
+      { label: "Servers", href: "/servers", icon: ServerIcon },
+      { label: "VMs", href: "/vms", icon: CpuIcon },
+      { label: "Domains", href: "/domains", icon: GlobeIcon },
+      { label: "Services", href: "/services", icon: ServerIcon },
+    ],
+  },
+  {
+    title: "Users & Billing",
+    items: [
+      { label: "Users", href: "/users", icon: UsersIcon },
+      { label: "Billing", href: "/billing", icon: CreditCardIcon },
+      { label: "Coupons", href: "/billing/coupons", icon: TagIcon },
+    ],
+  },
+  {
+    title: "System",
+    items: [
+      { label: "Audit Log", href: "/audit", icon: ClipboardIcon },
+      { label: "Platform Logs", href: "/logs", icon: TerminalIcon },
+      { label: "Password", href: "/password", icon: KeyIcon },
+    ],
+  },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-14 z-30 flex h-[calc(100vh-3.5rem)] w-56 flex-col border-r border-white/5 bg-neutral-950">
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
-        {navItems.map((item) => {
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition ${
-                isActive
-                  ? "bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20"
-                  : "text-neutral-500 hover:bg-white/5 hover:text-neutral-200"
-              }`}
-            >
-              <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-blue-400" : "text-neutral-600"}`} />
-              {item.label}
-            </Link>
-          );
-        })}
+    <aside className="fixed left-0 top-14 z-30 flex h-[calc(100vh-3.5rem)] w-56 flex-col border-r border-white/[0.06] bg-charcoal">
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        {sections.map((section) => (
+          <div key={section.title} className="mb-5">
+            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-neutral-600">{section.title}</p>
+            <div className="space-y-0.5">
+              {section.items.map((item) => {
+                const isActive =
+                  item.href === "/"
+                    ? pathname === "/"
+                    : item.href === "/billing"
+                      ? pathname === "/billing"
+                      : pathname.startsWith(item.href);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition ${
+                      isActive
+                        ? "bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20"
+                        : "text-neutral-500 hover:bg-white/[0.04] hover:text-neutral-200"
+                    }`}
+                  >
+                    <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-blue-400" : "text-neutral-600"}`} />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
     </aside>
   );

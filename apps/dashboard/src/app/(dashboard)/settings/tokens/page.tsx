@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@digi/ui";
 import { useEffect, useState } from "react";
 import { gql } from "~/lib/graphql";
 
@@ -86,10 +87,10 @@ export default function TokensPage() {
       )}
 
       {/* Create token */}
-      <section className="mb-6 rounded-xl border border-neutral-800 bg-neutral-900 p-6">
+      <section className="mb-6 rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
         <h2 className="mb-4 text-lg font-semibold text-white">Create Token</h2>
-        <div className="flex gap-2">
-          <input
+        <div className="flex-col gap-4 w-full">
+          <Input
             placeholder="Token name (e.g. CI/CD)"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
@@ -99,7 +100,7 @@ export default function TokensPage() {
           <button
             onClick={handleCreate}
             disabled={creating || !newName.trim()}
-            className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50"
+            className="rounded-lg mt-2 bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50"
           >
             {creating ? "Creating..." : "Create"}
           </button>
@@ -107,14 +108,14 @@ export default function TokensPage() {
       </section>
 
       {/* Token list */}
-      <section className="rounded-xl border border-neutral-800 bg-neutral-900 p-6">
+      <section className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
         <h2 className="mb-4 text-lg font-semibold text-white">Active Tokens</h2>
         {tokens.length === 0 ? (
           <p className="text-sm text-neutral-500">No API tokens yet.</p>
         ) : (
           <div className="space-y-3">
             {tokens.map((token) => (
-              <div key={token.id} className="flex items-center justify-between rounded-lg border border-neutral-800 px-4 py-3">
+              <div key={token.id} className="flex items-center justify-between rounded-lg border border-white/[0.08] px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-white">{token.name}</p>
                   <p className="text-xs text-neutral-500">

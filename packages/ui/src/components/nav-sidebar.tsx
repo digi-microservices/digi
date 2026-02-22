@@ -27,7 +27,7 @@ export function NavSidebar({ items, footerItems = [], logo, appName = "Digi", ap
   }
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-56 flex-col border-r border-white/[0.06] bg-neutral-950">
+    <aside className="fixed left-0 top-0 z-40 flex h-screen w-56 flex-col border-r border-white/[0.06] bg-charcoal">
       {/* Logo */}
       <div className="flex h-14 items-center gap-2.5 border-b border-white/[0.06] px-5">
         {logo ?? (

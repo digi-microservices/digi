@@ -7,8 +7,8 @@ export const env = createEnv({
   },
 
   client: {
-    NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:4000"),
-    NEXT_PUBLIC_ADMIN_URL: z.string().url().default("http://localhost:3002"),
+    NEXT_PUBLIC_API_URL: z.string().url().default("http://api.localhost"),
+    NEXT_PUBLIC_ADMIN_URL: z.string().url().default("http://admin.localhost"),
   },
 
   runtimeEnv: {

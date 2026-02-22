@@ -28,7 +28,7 @@ export function MonthlyRevenueChart({
   data: MonthlyRevenueData[];
 }) {
   return (
-    <div className="rounded-xl border border-white/5 bg-neutral-900 p-5">
+    <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5">
       <h3 className="mb-4 text-sm font-medium text-neutral-400">
         Monthly Revenue
       </h3>
@@ -70,7 +70,7 @@ export function DailyRevenueChart({
   data: DailyRevenueData[];
 }) {
   return (
-    <div className="rounded-xl border border-white/5 bg-neutral-900 p-5">
+    <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5">
       <h3 className="mb-4 text-sm font-medium text-neutral-400">
         Daily Revenue (Last 30 Days)
       </h3>

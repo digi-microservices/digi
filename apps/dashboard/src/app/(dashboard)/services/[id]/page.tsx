@@ -9,6 +9,7 @@ import { StatusBadge } from "~/components/status-badge";
 interface Container {
   id: string;
   type: string;
+  name: string;
   status: string;
   subdomain: string;
 }
@@ -17,6 +18,10 @@ interface Service {
   id: string;
   name: string;
   status: string;
+  sourceType: string;
+  gitUrl: string | null;
+  branch: string;
+  dockerImage: string | null;
   publicUrl: string;
   dashboardUrl: string;
   containers: Container[];
@@ -30,62 +35,53 @@ export default function ServiceDetailPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    gql<{ service: Service }>(`
-      query Service($id: ID!) {
+  async function fetchService() {
+    const data = await gql<{ service: Service }>(`
+      query Service($id: String!) {
         service(id: $id) {
-          id
-          name
-          status
-          publicUrl
-          dashboardUrl
-          containers {
-            id
-            type
-            status
-            subdomain
-          }
+          id name status sourceType gitUrl branch dockerImage
+          publicUrl dashboardUrl
+          containers { id type name status subdomain }
         }
       }
-    `, { id: params.id })
-      .then((data) => setService(data.service))
+    `, { id: params.id });
+    setService(data.service);
+  }
+
+  useEffect(() => {
+    fetchService()
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, [params.id]);
 
-  async function handleAction(action: string) {
+  async function handleDeploy() {
     if (!service) return;
-    setActionLoading(action);
-
+    setActionLoading("deploy");
     try {
       await gql(`
-        mutation ServiceAction($id: ID!, $action: String!) {
-          serviceAction(id: $id, action: $action) {
-            id
-            status
-          }
+        mutation Deploy($serviceId: String!) {
+          deployService(serviceId: $serviceId) { id status }
         }
-      `, { id: service.id, action });
+      `, { serviceId: service.id });
+      await fetchService();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Deploy failed");
+    } finally {
+      setActionLoading(null);
+    }
+  }
 
-      // Refetch service
-      const data = await gql<{ service: Service }>(`
-        query Service($id: ID!) {
-          service(id: $id) {
-            id
-            name
-            status
-            publicUrl
-            dashboardUrl
-            containers {
-              id
-              type
-              status
-              subdomain
-            }
-          }
+  async function handleContainerAction(containerId: string, action: "stop" | "restart") {
+    if (!service) return;
+    setActionLoading(`${action}-${containerId}`);
+    try {
+      const mutation = action === "stop" ? "stopContainer" : "restartContainer";
+      await gql(`
+        mutation ContainerAction($serviceId: String!, $containerId: String!) {
+          ${mutation}(serviceId: $serviceId, containerId: $containerId) { id status }
         }
-      `, { id: service.id });
-      setService(data.service);
+      `, { serviceId: service.id, containerId });
+      await fetchService();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Action failed");
     } finally {
@@ -137,29 +133,25 @@ export default function ServiceDetailPage() {
               {copied ? "Copied!" : "Copy"}
             </button>
           </div>
+          {service.sourceType === "github" && service.gitUrl && (
+            <p className="mt-1 text-xs text-neutral-500">
+              {service.gitUrl} ({service.branch})
+            </p>
+          )}
+          {service.sourceType === "docker" && service.dockerImage && (
+            <p className="mt-1 text-xs text-neutral-500">
+              Image: {service.dockerImage}
+            </p>
+          )}
         </div>
 
         <div className="flex gap-2">
           <button
-            onClick={() => handleAction("deploy")}
+            onClick={handleDeploy}
             disabled={actionLoading !== null}
             className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-600 disabled:opacity-50"
           >
             {actionLoading === "deploy" ? "Deploying..." : "Deploy"}
-          </button>
-          <button
-            onClick={() => handleAction("stop")}
-            disabled={actionLoading !== null}
-            className="rounded-lg border border-neutral-700 px-4 py-2 text-sm font-medium text-neutral-300 transition hover:bg-neutral-800 disabled:opacity-50"
-          >
-            {actionLoading === "stop" ? "Stopping..." : "Stop"}
-          </button>
-          <button
-            onClick={() => handleAction("restart")}
-            disabled={actionLoading !== null}
-            className="rounded-lg border border-neutral-700 px-4 py-2 text-sm font-medium text-neutral-300 transition hover:bg-neutral-800 disabled:opacity-50"
-          >
-            {actionLoading === "restart" ? "Restarting..." : "Restart"}
           </button>
         </div>
       </div>
@@ -206,9 +198,32 @@ export default function ServiceDetailPage() {
                   <span className="rounded-md border border-neutral-700 bg-neutral-800 px-2 py-1 text-xs font-mono text-neutral-300">
                     {container.type}
                   </span>
-                  <span className="text-sm text-neutral-300">{container.subdomain}</span>
+                  <div>
+                    <span className="text-sm text-neutral-300">{container.name}</span>
+                    {container.subdomain && (
+                      <span className="ml-2 text-xs text-neutral-500">{container.subdomain}</span>
+                    )}
+                  </div>
                 </div>
-                <StatusBadge status={container.status} />
+                <div className="flex items-center gap-3">
+                  <StatusBadge status={container.status} />
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => handleContainerAction(container.id, "restart")}
+                      disabled={actionLoading !== null}
+                      className="rounded-md px-2 py-1 text-xs text-neutral-400 transition hover:bg-neutral-800 hover:text-white disabled:opacity-50"
+                    >
+                      {actionLoading === `restart-${container.id}` ? "..." : "Restart"}
+                    </button>
+                    <button
+                      onClick={() => handleContainerAction(container.id, "stop")}
+                      disabled={actionLoading !== null}
+                      className="rounded-md px-2 py-1 text-xs text-neutral-400 transition hover:bg-neutral-800 hover:text-red-400 disabled:opacity-50"
+                    >
+                      {actionLoading === `stop-${container.id}` ? "..." : "Stop"}
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
